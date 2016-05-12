@@ -1,49 +1,62 @@
 package com.my.release01;
 
-import java.io.IOException;
+import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 
 public class HttpServer {
-	boolean isShutdwon = false;
+	public static final String WEB_ROOT = System.getProperty("user.dir") + File.separator + "src\\main\\webroot";
+	
+	private static final String SHUTDOWN_COMMAND = "/SHUTDOWN";
+	
+	boolean shutdown = false;
+	
 	public void await() {
+		ServerSocket serverSocket = null;
+		int port = 8080;
 		try {
-			ServerSocket server = new ServerSocket(8080, 10, InetAddress.getByName("127.0.0.1"));
-			while (!isShutdwon) {
-				Socket socket = server.accept();
-				InputStream is = socket.getInputStream();
-				byte[] buff = new byte[1024];
-				int i = 0;
-				StringBuilder build = new StringBuilder();
-				while (i != -1) {
-					i = is.read(buff);
-					build.append(new String(buff));
-				}
+			serverSocket = new ServerSocket(port, 10, InetAddress.getByName("127.0.0.1"));
+		} catch(Exception e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		
+		// Loop waiting for a request
+		while (!shutdown) {
+			try {
+				Socket socket = null;
+				InputStream input = null;
+				OutputStream out = null;
 				
+				socket = serverSocket.accept();
+				input = socket.getInputStream();
 				
+				// create request object
+				Request request = new Request(input);
+				request.parse();
 				
-				is.close();
+				// create response object
+				Response response = new Response(out);
+				response.setRequest(request);
+				response.sendStaticResource();
+				
+				// close socket
+				socket.close();
+				
+				// check if the previous URI is a shutdown command
+				shutdown = request.getUri().equals(SHUTDOWN_COMMAND);
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+				continue;
 			}
-			server.close();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 	
-	public String getURL(String str) {
-		Pattern patt = Pattern.compile("\\s(.*)\\s*HTTP.*\n");
-		Matcher m = patt.matcher(str);
-		return null;
-	}
 	
 	public static void main(String[] args) {
 		new HttpServer().await();
