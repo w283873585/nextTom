@@ -1,8 +1,5 @@
+package com.my.release02;
 
-
-package com.my.release01;
-
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
@@ -10,12 +7,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 
-public class HttpServer {
-	public static final String WEB_ROOT = System.getProperty("user.dir") + File.separator + "src\\main\\resources";
-	
+public class HttpServer1 {
 	private static final String SHUTDOWN_COMMAND = "/SHUTDOWN";
 	
-	boolean shutdown = false;
+	private boolean shutdown = false;
 	
 	public void await() {
 		ServerSocket serverSocket = null;
@@ -26,6 +21,7 @@ public class HttpServer {
 			e.printStackTrace();
 			System.exit(1);
 		}
+		
 		
 		// Loop waiting for a request
 		while (!shutdown) {
@@ -46,7 +42,18 @@ public class HttpServer {
 				// create response object
 				Response response = new Response(out);
 				response.setRequest(request);
-				response.sendStaticResource();
+
+
+				// check if this is a request for a servlet or 
+				// a static resource 
+				// a request for a servlet begins with "/servlet/"
+				if (request.getUri().startsWith("/servlet/")) {
+					ServletProcessor1 processor = new ServletProcessor1(); 
+					processor.process(request, response); 
+				} else {
+					StaticResoureProcessor processor = new StaticResoureProcessor(); 
+					processor.process(request, response); 
+				}
 				
 				// close socket
 				socket.close();
@@ -61,8 +68,7 @@ public class HttpServer {
 		}
 	}
 	
-	
 	public static void main(String[] args) {
-		new HttpServer().await();
+		new HttpServer1().await();
 	}
 }
