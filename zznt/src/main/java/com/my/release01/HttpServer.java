@@ -1,6 +1,7 @@
+
+
 package com.my.release01;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
@@ -9,7 +10,8 @@ import java.net.Socket;
 
 
 public class HttpServer {
-	public static final String WEB_ROOT = System.getProperty("user.dir") + File.separator + "src\\main\\webroot";
+	public static final String WEB_ROOT = "C:/Users/xnxs/Desktop";
+//	public static final String WEB_ROOT = System.getProperty("user.dir") + File.separator + "src\\main\\webroot";
 	
 	private static final String SHUTDOWN_COMMAND = "/SHUTDOWN";
 	
@@ -27,13 +29,15 @@ public class HttpServer {
 		
 		// Loop waiting for a request
 		while (!shutdown) {
+			Socket socket = null;
+			InputStream input = null;
+			OutputStream out = null;
+			
 			try {
-				Socket socket = null;
-				InputStream input = null;
-				OutputStream out = null;
 				
 				socket = serverSocket.accept();
 				input = socket.getInputStream();
+				out = socket.getOutputStream();
 				
 				// create request object
 				Request request = new Request(input);
@@ -48,7 +52,7 @@ public class HttpServer {
 				socket.close();
 				
 				// check if the previous URI is a shutdown command
-				shutdown = request.getUri().equals(SHUTDOWN_COMMAND);
+				shutdown = SHUTDOWN_COMMAND.equals(request.getUri());
 				
 			} catch (Exception e) {
 				e.printStackTrace();
