@@ -2,6 +2,7 @@ package com.my.release03.connector.http;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
@@ -13,6 +14,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 
 import com.util.ParameterMap;
+import com.util.RequestUtil;
 
 public class HttpRequest {
 	
@@ -102,6 +104,53 @@ public class HttpRequest {
 		this.input = input;
 	}
 
+	public void addHeader(String name, String value) {
+		name = name.toLowerCase();
+		synchronized (headers) {
+			ArrayList values = (ArrayList) headers.get(name);
+			if (values == null) {
+				values = new ArrayList();
+				headers.put(name, values);
+			}
+			values.add(value);
+		}
+	}
+	/**
+	 * Parse the parameters of this request, if it has not already occurred.
+	 * If parameters are present in both the query string and the request
+	 * content, they are merged.
+	 */
+	protected void parseParameters() {
+		if (parsed)
+			return;
+		
+		ParameterMap results = parameters;
+		if (results == null)
+			results = new ParameterMap();
+		results.setLocked(false);
+		String encoding = getCharacterEncoding();
+		if (encoding == null)
+			encoding = "ISO-8859-1";
+		
+		String queryString = getQueryString();
+		try {
+		    RequestUtil.parseParameters(results, queryString, encoding);
+	    }
+	    catch (UnsupportedEncodingException e) {}
+		
+		
+	}
+	
+	
+	public String getQueryString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getCharacterEncoding() {
+		return null;
+	}
+
 	public String getRequestURI() {
 		return null;
 	}
@@ -132,10 +181,6 @@ public class HttpRequest {
 
 	public void setRequestURI(String normalizedUri) {
 		// TODO Auto-generated method stub
-		
-	}
-
-	public void addHeader(String name, String value) {
 		
 	}
 

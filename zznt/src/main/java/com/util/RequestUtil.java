@@ -1,5 +1,6 @@
 package com.util;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import javax.servlet.http.Cookie;
@@ -33,5 +34,10 @@ public class RequestUtil {
 			}
 		}
 		return cookies.toArray (new Cookie [cookies.size ()]);
+	}
+
+	public static void parseParameters(ParameterMap results, String queryString, String encoding) throws UnsupportedEncodingException{
+		// TODO Auto-generated method stub
+		
 	}
 }
