@@ -40,4 +40,9 @@ public class RequestUtil {
 		// TODO Auto-generated method stub
 		
 	}
+
+	public static void parseParameters(ParameterMap results, byte[] buf, String encoding) {
+		// TODO Auto-generated method stub
+		
+	}
 }
