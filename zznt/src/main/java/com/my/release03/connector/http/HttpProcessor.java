@@ -1,5 +1,6 @@
 package com.my.release03.connector.http;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 
@@ -62,7 +63,7 @@ public class HttpProcessor {
 		}
 	}
 
-	private void parseHeaders(SocketInputStream input) throws ServletException {
+	private void parseHeaders(SocketInputStream input) throws ServletException, IOException {
 		while (true) {
 			HttpHeader header = new HttpHeader(); 
 			// Read the next header 
@@ -108,7 +109,8 @@ public class HttpProcessor {
 		}
 	}
 
-	private void parseRequest(SocketInputStream input, OutputStream output) throws ServletException {
+	private void parseRequest(SocketInputStream input, OutputStream output) 
+		throws ServletException, IOException {
 		// parse the incoming request line
 		input.readRequestLine(requestLine);
 		
