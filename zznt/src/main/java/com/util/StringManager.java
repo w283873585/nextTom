@@ -41,4 +41,8 @@ public class StringManager {
 		}
 		return mgr;
     }
+
+	public String getString(String string, String address) {
+		return null;
+	}
 }

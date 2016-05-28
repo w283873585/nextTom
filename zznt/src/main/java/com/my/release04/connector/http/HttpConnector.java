@@ -1,66 +1,283 @@
 package com.my.release04.connector.http;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.util.Stack;
+import java.util.Vector;
 
 import com.catalina.Connector;
 import com.catalina.Container;
+import com.catalina.DefaultServerSocketFactory;
+import com.catalina.Lifecycle;
 import com.catalina.LifecycleException;
+import com.catalina.LifecycleListener;
 import com.catalina.Request;
 import com.catalina.Response;
 import com.catalina.ServerSocketFactory;
 import com.catalina.Service;
+import com.util.StringManager;
 
-public class HttpConnector implements Runnable, Connector {
-	private Container container;
+public class HttpConnector implements Runnable, Connector, Lifecycle {
 	
+	// another component
+	private Service service = null;
+	private Container container = null;
+	
+	// normal attribute
+	private int debug = 0;
+	private int bufferSize = 2048;
+	private static final String info =
+			"org.apache.catalina.connector.http.HttpConnector/1.0";
+	
+	// serversocket
+	private ServerSocket serverSocket = null;
+	private ServerSocketFactory factory = null;
+	private int port = 8080;
+	private String address = null;
+	private int connectionTimeout = Constants.DEFAULT_CONNECTION_TIMEOUT;
+	
+	// HTTP Properties
+	private String scheme = "http";
+	private boolean secure = false;
+	private int proxyPort = 0;
+	private String proxyName = null;
+	private int redirectPort = 443;
+	private int acceptCount = 10;
+	private boolean allowChunking = true;
+	private boolean tcpNoDelay = true;
+	private boolean enableLookups = false;
+	
+	// about processors
+	private Vector created = new Vector();
+	private Stack processors = new Stack();
+	private int curProcessors = 0;
+	protected int minProcessors = 5;
+	private int maxProcessors = 20;
+	
+	// about lifecycle
+	private boolean initialized = false;
+    private boolean started = false;
+    private boolean stopped = false;
+	
+    // about background thread
+    private Thread thread = null;
+    private String threadName = null;
+    private Object threadSync = new Object();
+    
+    // about errorInfo
+    private StringManager sm =
+	        StringManager.getManager(Constants.Package);
+    
+    
 	public HttpConnector() throws Exception {
 		super();
 	}
 
-	boolean stopped;
-	private String scheme = "http";
+	public ServerSocketFactory getFactory() {
+		if (this.factory == null) {
+            synchronized (this) {
+                this.factory = new DefaultServerSocketFactory();
+            }
+        }
+        return (this.factory);
+	}
+	
+	
+	
+	// ---------------------------------------------- Lifecycle Methods
+	
+	public void initialize() throws LifecycleException {
+		if (initialized) {
+			throw new LifecycleException (
+	                sm.getString("httpConnector.alreadyInitialized"));
+		}
+		
+		this.initialized = true;
+		Exception eRethrow = null;
+		
+		// Establish a server socket on the specified port
+        try {
+            serverSocket = open();
+        } catch (IOException ioe) {
+            log("httpConnector, io problem: ", ioe);
+            eRethrow = ioe;
+        } catch (KeyStoreException kse) {
+            log("httpConnector, keystore problem: ", kse);
+            eRethrow = kse;
+        } catch (NoSuchAlgorithmException nsae) {
+            log("httpConnector, keystore algorithm problem: ", nsae);
+            eRethrow = nsae;
+        } catch (CertificateException ce) {
+            log("httpConnector, certificate problem: ", ce);
+            eRethrow = ce;
+        } catch (UnrecoverableKeyException uke) {
+            log("httpConnector, unrecoverable key: ", uke);
+            eRethrow = uke;
+        } catch (KeyManagementException kme) {
+            log("httpConnector, key management problem: ", kme);
+            eRethrow = kme;
+        }
+        
+        if ( eRethrow != null )
+            throw new LifecycleException(threadName + ".open", eRethrow);
+	}
+	
+	
+	public void start() throws LifecycleException {
+		
+		if (started)
+			throw new LifecycleException
+            (sm.getString("httpConnector.alreadyStarted"));
+		threadName = "HttpConnector[" + port + "]";
+		started = true;
+		
+		// start our backgroud thread
+		threadStart();
+		
+		// Create the specified minimum number of processors
+        while (curProcessors < minProcessors) {
+            if ((maxProcessors > 0) && (curProcessors >= maxProcessors))
+                break;
+            HttpProcessor processor = newProcessor();
+            recycle(processor);
+        }
+	}
+	
+	public void stop() throws LifecycleException {
+		// Validate and update our current state
+        if (!started)
+            throw new LifecycleException
+                (sm.getString("httpConnector.notStarted"));
+        started = false;
+
+        // Gracefully shut down all processors we have created
+        for (int i = created.size() - 1; i >= 0; i--) {
+            HttpProcessor processor = (HttpProcessor) created.elementAt(i);
+            if (processor instanceof Lifecycle) {
+                try {
+                    ((Lifecycle) processor).stop();
+                } catch (LifecycleException e) {
+                    log("HttpConnector.stop", e);
+                }
+            }
+        }
+
+        synchronized (threadSync) {
+            // Close the server socket we were using
+            if (serverSocket != null) {
+                try {
+                    serverSocket.close();
+                } catch (IOException e) {
+                    ;
+                }
+            }
+            // Stop our background thread
+            threadStop();
+        }
+        serverSocket = null;
+	}
+	
+	
+	
+	// ---------------------------------------------- about HttpProcessor Methods
+	private void recycle(HttpProcessor processor) {
+		
+	}
+	private HttpProcessor newProcessor() {
+		return null;
+	}
+	
+	
+	
+	// ----------------------------------------------- private methods 
+	
+	private ServerSocket open() 
+			throws IOException, KeyStoreException, NoSuchAlgorithmException,
+	           CertificateException, UnrecoverableKeyException,
+	           KeyManagementException {
+		 // Acquire the server socket factory for this Connector
+		ServerSocketFactory factory = getFactory();
+		
+		// If no address is specified, open a connection on all addresses
+        if (address == null) {
+            log(sm.getString("httpConnector.allAddresses"));
+            try {
+                return (factory.createSocket(port, acceptCount));
+            } catch (BindException be) {
+                throw new BindException(be.getMessage() + ":" + port);
+            }
+        }
+
+        // Open a server socket on the specified address
+        try {
+            InetAddress is = InetAddress.getByName(address);
+            log(sm.getString("httpConnector.anAddress", address));
+            try {
+                return (factory.createSocket(port, acceptCount, is));
+            } catch (BindException be) {
+                throw new BindException(be.getMessage() + ":" + address +
+                                        ":" + port);
+            }
+        } catch (Exception e) {
+            log(sm.getString("httpConnector.noAddress", address));
+            try {
+                return (factory.createSocket(port, acceptCount));
+            } catch (BindException be) {
+                throw new BindException(be.getMessage() + ":" + port);
+            }
+        }
+	}
+	
+	// ---------------------------------------------- Background Thread Methods 
+	
+	private void threadStart() {
+		
+		log(sm.getString("httpConnector.starting"));
+
+        thread = new Thread(this, threadName);
+        thread.setDaemon(true);
+        thread.start();
+	}
+	
+	/**
+     * Stop the background processing thread.
+     */
+    private void threadStop() {
+
+        log(sm.getString("httpConnector.stopping"));
+
+        stopped = true;
+        try {
+            threadSync.wait(5000);
+        } catch (InterruptedException e) {
+            ;
+        }
+        thread = null;
+    }
+	
+    public void run() {
+		
+	}
+    
+	
+	private void log(String info) {
+		System.out.println(info);
+	}
+	
+	private void log(String string, Exception e) {
+		log(string);
+	}
 	
 	public String getScheme() {
 		return scheme;
 	}
-	
-	
-	public void start() {
-		Thread thread = new Thread(this);
-		thread.start();
-	}
-
-	@Override
-	public void run() {
-		ServerSocket serverSocket = null;
-		int port = 8080;
-		
-		try {
-			serverSocket = new ServerSocket(port, 1, InetAddress.getByName("127.0.0.1"));
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		
-		while (!stopped) {
-			// Accept the next incoming connection from the server socket
-			Socket socket = null;
-			try {
-				socket = serverSocket.accept();
-				System.out.println("请求进来了。。。");
-			} catch (Exception e) {
-				continue;
-			}
-			
-			// Hand this socket off to an HttpProcessor
-			HttpProcessor processor = new HttpProcessor(this);
-			processor.process(socket);
-		}
-	}
-
 
 	public Container getContainer() {
 		return container;
@@ -70,91 +287,199 @@ public class HttpConnector implements Runnable, Connector {
 		this.container = container;
 	}
 
-
-	@Override
 	public boolean getEnableLookups() {
-		// TODO Auto-generated method stub
-		return false;
+		return this.enableLookups;
 	}
 
-
-	@Override
 	public void setEnableLookups(boolean enableLookups) {
-		// TODO Auto-generated method stub
-		
+		this.enableLookups = enableLookups;
 	}
 
-
-	@Override
-	public ServerSocketFactory getFactory() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	@Override
 	public void setFactory(ServerSocketFactory factory) {
-		// TODO Auto-generated method stub
-		
+		this.factory = factory;
 	}
 
-
-	@Override
 	public String getInfo() {
-		// TODO Auto-generated method stub
-		return null;
+		return info;
 	}
 
-
-	@Override
 	public int getRedirectPort() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.redirectPort;
 	}
 
-
-	@Override
 	public void setRedirectPort(int redirectPort) {
-		// TODO Auto-generated method stub
-		
+		this.redirectPort = redirectPort; 
 	}
 
-
-	@Override
 	public void setScheme(String scheme) {
-		// TODO Auto-generated method stub
-		
+		this.scheme = scheme;
 	}
 
-
-	@Override
 	public boolean getSecure() {
-		// TODO Auto-generated method stub
-		return false;
+		return this.secure;
 	}
 
-
-	@Override
 	public void setSecure(boolean secure) {
-		// TODO Auto-generated method stub
-		
+		this.secure = secure;
 	}
 
-
-	@Override
 	public Service getService() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.service;
 	}
 
-
-	@Override
 	public void setService(Service service) {
-		// TODO Auto-generated method stub
-		
+		this.service = service;
 	}
 
+	public int getConnectionTimeout() {
+		return connectionTimeout;
+	}
+	
+	public void setConnectionTimeout(int connectionTimeout) {
+		this.connectionTimeout = connectionTimeout;
+	}
+	
+	public int getAcceptCount() {
+		return acceptCount;
+	}
+	
+	public void setAcceptCount(int count) {
+        this.acceptCount = count;
+    }
+	
+	public boolean isChunkingAllowed() {
+        return (allowChunking);
+    }
+	
+	public boolean getAllowChunking() {
+        return isChunkingAllowed();
+    }
+	
+	public void setAllowChunking(boolean allowChunking) {
+        this.allowChunking = allowChunking;
+    }
+	
+    public String getAddress() {
+        return (this.address);
+    }
 
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public boolean isAvailable() {
+        return (started);
+    }
+    
+    public int getBufferSize() {
+        return (this.bufferSize);
+    }
+    
+    public void setBufferSize(int bufferSize) {
+        this.bufferSize = bufferSize;
+    }
+    
+    public int getCurProcessors() {
+        return (curProcessors);
+    }
+	
+    public int getDebug() {
+        return (debug);
+    }
+
+    public void setDebug(int debug) {
+        this.debug = debug;
+    }
+    
+    public int getMinProcessors() {
+        return (minProcessors);
+    }
+    
+    public void setMinProcessors(int minProcessors) {
+        this.minProcessors = minProcessors;
+    }
+    
+    public int getMaxProcessors() {
+        return (maxProcessors);
+    }
+    
+    public void setMaxProcessors(int maxProcessors) {
+        this.maxProcessors = maxProcessors;
+    }
+    
+    public int getPort() {
+        return (this.port);
+    }
+    
+    public void setPort(int port) {
+        this.port = port;
+    }
+    
+    /**
+     * Return the proxy server name for this Connector.
+     */
+    public String getProxyName() {
+
+        return (this.proxyName);
+
+    }
+
+
+    /**
+     * Set the proxy server name for this Connector.
+     *
+     * @param proxyName The new proxy server name
+     */
+    public void setProxyName(String proxyName) {
+
+        this.proxyName = proxyName;
+
+    }
+
+
+    /**
+     * Return the proxy server port for this Connector.
+     */
+    public int getProxyPort() {
+
+        return (this.proxyPort);
+
+    }
+
+
+    /**
+     * Set the proxy server port for this Connector.
+     *
+     * @param proxyPort The new proxy server port
+     */
+    public void setProxyPort(int proxyPort) {
+
+        this.proxyPort = proxyPort;
+
+    }
+
+    /**
+     * Return the TCP no delay flag value.
+     */
+    public boolean getTcpNoDelay() {
+
+        return (this.tcpNoDelay);
+
+    }
+
+
+    /**
+     * Set the TCP no delay flag which will be set on the socket after
+     * accepting a connection.
+     *
+     * @param tcpNoDelay The new TCP no delay flag
+     */
+    public void setTcpNoDelay(boolean tcpNoDelay) {
+
+        this.tcpNoDelay = tcpNoDelay;
+
+    }
+    
 	@Override
 	public Request createRequest() {
 		// TODO Auto-generated method stub
@@ -168,10 +493,11 @@ public class HttpConnector implements Runnable, Connector {
 		return null;
 	}
 
+	public void addLifecycleListener(LifecycleListener listener) {}
 
-	@Override
-	public void initialize() throws LifecycleException {
-		// TODO Auto-generated method stub
-		
+	public LifecycleListener[] findLifecycleListeners() {
+		return null;
 	}
+
+	public void removeLifecycleListener(LifecycleListener listener) {}
 }
