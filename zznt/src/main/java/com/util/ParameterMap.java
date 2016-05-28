@@ -3,8 +3,6 @@ package com.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.my.release03.StringManager;
-
 @SuppressWarnings({ "serial", "rawtypes" })
 public final class ParameterMap extends HashMap{
 	public ParameterMap(){

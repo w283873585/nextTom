@@ -1,4 +1,4 @@
-package com.my.release03;
+package com.util;
 
 import java.util.Hashtable;
 import java.util.MissingResourceException;

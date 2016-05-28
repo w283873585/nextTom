@@ -5,9 +5,9 @@ import java.io.InputStream;
 
 import javax.servlet.ServletInputStream;
 
-import com.my.release03.StringManager;
 import com.my.release03.connector.http.Constants;
 import com.my.release03.connector.http.HttpRequest;
+import com.util.StringManager;
 
 public class RequestStream extends ServletInputStream {
 

@@ -4,7 +4,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.my.release03.StringManager;
+import com.util.StringManager;
 
 public class SocketInputStream extends InputStream{
 

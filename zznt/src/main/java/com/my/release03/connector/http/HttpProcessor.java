@@ -9,8 +9,8 @@ import javax.servlet.http.Cookie;
 
 import com.my.release03.ServletProcessor;
 import com.my.release03.StaticResourceProcessor;
-import com.my.release03.StringManager;
 import com.util.RequestUtil;
+import com.util.StringManager;
 
 public class HttpProcessor {
 	protected StringManager sm = StringManager.getManager("com.my.release03.connector.http");
