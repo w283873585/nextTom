@@ -36,6 +36,7 @@ public class HttpConnector implements Runnable{
 			Socket socket = null;
 			try {
 				socket = serverSocket.accept();
+				System.out.println("请求进来了。。。");
 			} catch (Exception e) {
 				continue;
 			}
