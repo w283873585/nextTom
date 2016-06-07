@@ -187,7 +187,7 @@ public class HttpConnector implements Runnable, Connector, Lifecycle {
 	
 	
 	// ---------------------------------------------- about HttpProcessor Methods
-	private void recycle(HttpProcessor processor) {
+	void recycle(HttpProcessor processor) {
 		
 	}
 	private HttpProcessor newProcessor() {

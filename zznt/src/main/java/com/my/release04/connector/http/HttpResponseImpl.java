@@ -6,13 +6,14 @@ import java.io.PrintWriter;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
 
 import com.catalina.Connector;
 import com.catalina.Context;
 import com.catalina.Request;
 import com.catalina.Response;
 
-public class HttpResponseImpl implements Response{
+public class HttpResponseImpl implements HttpResponse{
 
 	@Override
 	public Connector getConnector() {
@@ -176,4 +177,45 @@ public class HttpResponseImpl implements Response{
 		
 	}
 
+	@Override
+	public Cookie[] getCookies() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getHeader(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String[] getHeaderNames() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String[] getHeaderValues(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getMessage() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getStatus() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void reset(int status, String message) {
+		// TODO Auto-generated method stub
+		
+	}
 }
