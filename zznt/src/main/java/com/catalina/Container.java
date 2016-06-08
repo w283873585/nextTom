@@ -1,10 +1,10 @@
 package com.catalina;
 
 
-import javax.servlet.ServletException;
+import java.io.IOException;
+import java.io.InterruptedIOException;
 
-import com.my.release04.connector.http.HttpRequestImpl;
-import com.my.release04.connector.http.HttpResponseImpl;
+import javax.servlet.ServletException;
 
 
 /**
@@ -118,7 +118,7 @@ public interface Container {
     public String getInfo();
 
 
-	public void invoke(HttpRequestImpl request, HttpResponseImpl response) throws ServletException;
+	public void invoke(Request request, Response response) throws ServletException, IOException;
 
 
     /**

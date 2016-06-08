@@ -14,8 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.catalina.Container;
 import com.catalina.Request;
 import com.catalina.Response;
-import com.my.release04.connector.http.HttpRequestImpl;
-import com.my.release04.connector.http.HttpResponseImpl;
 
 public class SimpleContainer implements Container {
 
@@ -67,10 +65,4 @@ public class SimpleContainer implements Container {
       System.out.println(e.toString());
     }
   }
-
-	@Override
-	public void invoke(HttpRequestImpl request, HttpResponseImpl response) throws ServletException {
-		// TODO Auto-generated method stub
-		
-	}
 }

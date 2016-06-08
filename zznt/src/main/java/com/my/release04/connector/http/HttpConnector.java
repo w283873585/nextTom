@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.security.AccessControlException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -203,7 +205,22 @@ public class HttpConnector implements Runnable, Connector, Lifecycle {
 		return processor;
 	}
 	
-	
+	private HttpProcessor createProcessor() {
+
+        synchronized (processors) {
+            if (processors.size() > 0)
+                return ((HttpProcessor) processors.pop());
+            if ((maxProcessors > 0) && (curProcessors < maxProcessors)) {
+                return (newProcessor());
+            } else {
+                if (maxProcessors < 0) {
+                    return (newProcessor());
+                } else {
+                    return (null);
+                }
+            }
+        }
+    }
 	
 	// ----------------------------------------------- private methods 
 	
@@ -272,7 +289,44 @@ public class HttpConnector implements Runnable, Connector, Lifecycle {
     }
 	
     public void run() {
-		
+		// loop util we receive a shutdown command
+    	while (!stopped) {
+    		
+    		// accept the next incoming connection from the server socket
+    		Socket socket = null;
+    		try {
+				socket = serverSocket.accept();
+				if (connectionTimeout > 0) 
+					socket.setSoTimeout(connectionTimeout);
+			} catch (AccessControlException ace) {
+				log("socket accept security exception: " + ace.getMessage());
+                continue;
+			} catch (IOException e) {
+				if (started && !stopped)
+                    log("accept: ", e);
+                break;
+			}
+    		
+    		// Hand this socket off to an appropriate processor
+    		HttpProcessor processor = createProcessor();
+            if (processor == null) {
+                try {
+                    log(sm.getString("httpConnector.noProcessor"));
+                    socket.close();
+                } catch (IOException e) {
+                    ;
+                }
+                continue;
+            }
+            processor.assign(socket);
+            
+            // The processor will recycle itself when it finishes
+    	}
+    	
+    	// Notify the threadStop() method that we have shut ourselves down
+        synchronized (threadSync) {
+            threadSync.notifyAll();
+        }
 	}
     
 	
@@ -491,15 +545,17 @@ public class HttpConnector implements Runnable, Connector, Lifecycle {
     
 	@Override
 	public Request createRequest() {
-		// TODO Auto-generated method stub
-		return null;
+		HttpRequestImpl request = new HttpRequestImpl();
+        request.setConnector(this);
+        return (request);
 	}
 
 
 	@Override
 	public Response createResponse() {
-		// TODO Auto-generated method stub
-		return null;
+		HttpResponseImpl response = new HttpResponseImpl();
+        response.setConnector(this);
+        return (response);
 	}
 
 	public void addLifecycleListener(LifecycleListener listener) {}
