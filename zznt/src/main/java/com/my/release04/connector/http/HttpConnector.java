@@ -188,10 +188,19 @@ public class HttpConnector implements Runnable, Connector, Lifecycle {
 	
 	// ---------------------------------------------- about HttpProcessor Methods
 	void recycle(HttpProcessor processor) {
-		
+		processors.push(processor);
 	}
 	private HttpProcessor newProcessor() {
-		return null;
+		HttpProcessor processor = new HttpProcessor(this, curProcessors++);
+		if (processor instanceof Lifecycle) {
+			try {
+				((Lifecycle) processor).start();
+			} catch (LifecycleException e) {
+				return null;
+			}
+		}
+		created.addElement(processor);
+		return processor;
 	}
 	
 	

@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.catalina.Globals;
+import com.catalina.HttpRequest;
 import com.catalina.Lifecycle;
 import com.catalina.LifecycleException;
 import com.catalina.LifecycleListener;

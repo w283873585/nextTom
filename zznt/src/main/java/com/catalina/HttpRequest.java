@@ -62,14 +62,12 @@
  */
 
 
-package com.my.release04.connector.http;
+package com.catalina;
 
 
 import java.security.Principal;
 import java.util.Locale;
 import javax.servlet.http.Cookie;
-
-import com.catalina.Request;
 
 
 /**

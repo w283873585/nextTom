@@ -1,221 +1,267 @@
 package com.my.release04.connector.http;
 
+
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-
+import java.util.ArrayList;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
-import com.catalina.Connector;
-import com.catalina.Context;
-import com.catalina.Request;
-import com.catalina.Response;
+import com.my.release04.connector.HttpResponseBase;
 
-public class HttpResponseImpl implements HttpResponse{
 
-	@Override
-	public Connector getConnector() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+/**
+ * Implementation of <b>HttpResponse</b> specific to the HTTP connector.
+ *
+ * @author Craig R. McClanahan
+ * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
+ * @version $Revision: 1.13 $ $Date: 2002/03/18 07:15:40 $
+ * @deprecated
+ */
 
-	@Override
-	public void setConnector(Connector connector) {
-		// TODO Auto-generated method stub
-		
-	}
+public final class HttpResponseImpl
+    extends HttpResponseBase {
 
-	@Override
-	public int getContentCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
-	@Override
-	public Context getContext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    // ----------------------------------------------------- Instance Variables
 
-	@Override
-	public void setContext(Context context) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void setAppCommitted(boolean appCommitted) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Descriptive information about this Response implementation.
+     */
+    protected static final String info =
+        "org.apache.catalina.connector.http.HttpResponseImpl/1.0";
 
-	@Override
-	public boolean isAppCommitted() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
-	@Override
-	public boolean getIncluded() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    /**
+     * True if chunking is allowed.
+     */
+    protected boolean allowChunking;
 
-	@Override
-	public void setIncluded(boolean included) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public String getInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Associated HTTP response stream.
+     */
+    protected HttpResponseStream responseStream;
 
-	@Override
-	public Request getRequest() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public void setRequest(Request request) {
-		// TODO Auto-generated method stub
-		
-	}
+    // ------------------------------------------------------------- Properties
 
-	@Override
-	public ServletResponse getResponse() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public OutputStream getStream() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Return descriptive information about this Response implementation and
+     * the corresponding version number, in the format
+     * <code>&lt;description&gt;/&lt;version&gt;</code>.
+     */
+    public String getInfo() {
 
-	@Override
-	public void setStream(OutputStream stream) {
-		// TODO Auto-generated method stub
-		
-	}
+        return (info);
 
-	@Override
-	public void setSuspended(boolean suspended) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	@Override
-	public boolean isSuspended() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
-	@Override
-	public void setError() {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Set the chunking flag.
+     */
+    void setAllowChunking(boolean allowChunking) {
+        this.allowChunking = allowChunking;
+    }
 
-	@Override
-	public boolean isError() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
-	@Override
-	public ServletOutputStream createOutputStream() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * True if chunking is allowed.
+     */
+    public boolean isChunkingAllowed() {
+        return allowChunking;
+    }
 
-	@Override
-	public void finishResponse() throws IOException {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public int getContentLength() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    // ------------------------------------------------------ Protected Methods
 
-	@Override
-	public String getContentType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Return the HTTP protocol version implemented by this response
+     * object.
+     *
+     * @return The &quot;HTTP/1.1&quot; string.
+     */
+    protected String getProtocol() {
+        return("HTTP/1.1");
+    }
 
-	@Override
-	public PrintWriter getReporter() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public void recycle() {
-		// TODO Auto-generated method stub
-		
-	}
+    // --------------------------------------------------------- Public Methods
 
-	@Override
-	public void resetBuffer() {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Release all object references, and initialize instance variables, in
+     * preparation for reuse of this object.
+     */
+    public void recycle() {
 
-	@Override
-	public void sendAcknowledgement() throws IOException {
-		// TODO Auto-generated method stub
-		
-	}
+        super.recycle();
+        responseStream = null;
+        allowChunking = false;
 
-	@Override
-	public Cookie[] getCookies() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    }
 
-	@Override
-	public String getHeader(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public String[] getHeaderNames() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Send an error response with the specified status and message.
+     *
+     * @param status HTTP status code to send
+     * @param message Corresponding message to send
+     *
+     * @exception IllegalStateException if this response has
+     *  already been committed
+     * @exception IOException if an input/output error occurs
+     */
+    public void sendError(int status, String message) throws IOException {
 
-	@Override
-	public String[] getHeaderValues(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        addHeader("Connection", "close");
+        super.sendError(status, message);
 
-	@Override
-	public String getMessage() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    }
 
-	@Override
-	public int getStatus() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
-	@Override
-	public void reset(int status, String message) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Clear any content written to the buffer.  In addition, all cookies
+     * and headers are cleared, and the status is reset.
+     *
+     * @exception IllegalStateException if this response has already
+     *  been committed
+     */
+    public void reset() {
+
+        // Saving important HTTP/1.1 specific headers
+        String connectionValue =
+            (String) getHeader("Connection");
+        String transferEncodingValue =
+            (String) getHeader("Transfer-Encoding");
+        super.reset();
+        if (connectionValue != null)
+            addHeader("Connection", connectionValue);
+        if (transferEncodingValue != null)
+            addHeader("Transfer-Encoding", transferEncodingValue);
+
+    }
+
+
+    /**
+     * Create and return a ServletOutputStream to write the content
+     * associated with this Response.
+     *
+     * @exception IOException if an input/output error occurs
+     */
+    public ServletOutputStream createOutputStream() throws IOException {
+
+        responseStream = new HttpResponseStream(this);
+        return (responseStream);
+
+    }
+
+
+    /**
+     * Tests is the connection will be closed after the processing of the
+     * request.
+     */
+    public boolean isCloseConnection() {
+        String connectionValue = (String) getHeader("Connection");
+        return (connectionValue != null
+                && connectionValue.equals("close"));
+    }
+
+
+    /**
+     * Removes the specified header.
+     *
+     * @param name Name of the header to remove
+     * @param value Value to remove
+     */
+    public void removeHeader(String name, String value) {
+
+        if (isCommitted())
+            return;
+
+        if (included)
+            return;     // Ignore any call from an included servlet
+
+        synchronized (headers) {
+            ArrayList values = (ArrayList) headers.get(name);
+            if ((values != null) && (!values.isEmpty())) {
+                values.remove(value);
+                if (values.isEmpty())
+                    headers.remove(name);
+            }
+        }
+
+    }
+
+
+    /**
+     * Has stream been created ?
+     */
+    public boolean isStreamInitialized() {
+        return (responseStream != null);
+    }
+
+
+    /**
+     * Perform whatever actions are required to flush and close the output
+     * stream or writer, in a single operation.
+     *
+     * @exception IOException if an input/output error occurs
+     */
+    public void finishResponse() throws IOException {
+
+        if (getStatus() < HttpServletResponse.SC_BAD_REQUEST) {
+            if ((!isStreamInitialized()) && (getContentLength() == -1)
+                && (getStatus() >= 200)
+                && (getStatus() != SC_NOT_MODIFIED)
+                && (getStatus() != SC_NO_CONTENT))
+                setContentLength(0);
+        } else {
+            setHeader("Connection", "close");
+        }
+        super.finishResponse();
+
+    }
+
+
+    // -------------------------------------------- HttpServletResponse Methods
+
+
+    /**
+     * Set the HTTP status to be returned with this response.
+     *
+     * @param status The new HTTP status
+     */
+    public void setStatus(int status) {
+
+        super.setStatus(status);
+
+        if (responseStream != null)
+            responseStream.checkChunking(this);
+
+    }
+
+
+    /**
+     * Set the content length (in bytes) for this Response.
+     *
+     * @param length The new content length
+     */
+    public void setContentLength(int length) {
+
+        if (isCommitted())
+            return;
+
+        if (included)
+            return;     // Ignore any call from an included servlet
+
+        super.setContentLength(length);
+
+        if (responseStream != null)
+            responseStream.checkChunking(this);
+
+    }
+
+
 }

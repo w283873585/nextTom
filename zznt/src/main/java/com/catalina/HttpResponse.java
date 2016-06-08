@@ -1,7 +1,7 @@
 /*
- * $Header: /home/cvs/jakarta-tomcat-4.0/catalina/src/share/org/apache/catalina/Context.java,v 1.21 2002/05/12 01:22:18 glenn Exp $
- * $Revision: 1.21 $
- * $Date: 2002/05/12 01:22:18 $
+ * $Header: /home/cvs/jakarta-tomcat-4.0/catalina/src/share/org/apache/catalina/HttpResponse.java,v 1.5 2001/07/22 20:13:30 pier Exp $
+ * $Revision: 1.5 $
+ * $Date: 2001/07/22 20:13:30 $
  *
  * ====================================================================
  *
@@ -64,97 +64,82 @@
 
 package com.catalina;
 
-import java.util.logging.Logger;
 
-import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
 
-import com.util.CharsetMapper;
 
 /**
- * A <b>Context</b> is a Container that represents a servlet context, and
- * therefore an individual web application, in the Catalina servlet engine.
- * It is therefore useful in almost every deployment of Catalina (even if a
- * Connector attached to a web server (such as Apache) uses the web server's
- * facilities to identify the appropriate Wrapper to handle this request.
- * It also provides a convenient mechanism to use Interceptors that see
- * every request processed by this particular web application.
- * <p>
- * The parent Container attached to a Context is generally a Host, but may
- * be some other implementation, or may be omitted if it is not necessary.
- * <p>
- * The child containers attached to a Context are generally implementations
- * of Wrapper (representing individual servlet definitions).
- * <p>
+ * An <b>HttpResponse</b> is the Catalina-internal facade for an
+ * <code>HttpServletResponse</code> that is to be produced,
+ * based on the processing of a corresponding <code>HttpRequest</code>.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.21 $ $Date: 2002/05/12 01:22:18 $
+ * @version $Revision: 1.5 $ $Date: 2001/07/22 20:13:30 $
  */
 
-public interface Context extends Container {
+public interface HttpResponse
+    extends Response {
 
 
-    // ----------------------------------------------------- Manifest Constants
+    // --------------------------------------------------------- Public Methods
 
 
     /**
-     * The LifecycleEvent type sent when a context is reloaded.
+     * Return an array of all cookies set for this response, or
+     * a zero-length array if no cookies have been set.
      */
-    public static final String RELOAD_EVENT = "reload";
-
-
-    // ------------------------------------------------------------- Properties
+    public Cookie[] getCookies();
 
 
     /**
-     * Return the set of initialized application listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
+     * Return the value for the specified header, or <code>null</code> if this
+     * header has not been set.  If more than one value was added for this
+     * name, only the first is returned; use getHeaderValues() to retrieve all
+     * of them.
      *
-     * @exception IllegalStateException if this method is called before
-     *  this application has started, or after it has been stopped
+     * @param name Header name to look up
      */
-    public Object[] getApplicationListeners();
+    public String getHeader(String name);
 
 
     /**
-     * Store the set of initialized application listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
+     * Return an array of all the header names set for this response, or
+     * a zero-length array if no headers have been set.
+     */
+    public String[] getHeaderNames1();
+
+
+    /**
+     * Return an array of all the header values associated with the
+     * specified header name, or an zero-length array if there are no such
+     * header values.
      *
-     * @param listeners The set of instantiated listener objects.
+     * @param name Header name to look up
      */
-    public void setApplicationListeners(Object listeners[]);
+    public String[] getHeaderValues(String name);
 
 
     /**
-     * Return the application available flag for this Context.
+     * Return the error message that was set with <code>sendError()</code>
+     * for this Response.
      */
-    public boolean getAvailable();
+    public String getMessage();
 
 
     /**
-     * Set the application available flag for this Context.
+     * Return the HTTP status code associated with this Response.
+     */
+    public int getStatus();
+
+
+    /**
+     * Reset this response, and specify the values for the HTTP status code
+     * and corresponding message.
      *
-     * @param available The new application available flag
+     * @exception IllegalStateException if this response has already been
+     *  committed
      */
-    public void setAvailable(boolean available);
+    public void reset(int status, String message);
 
-
-	public ServletContext getServletContext();
-
-
-	public Manager getManager();
-
-
-	public boolean getCookies();
-
-
-	public CharsetMapper getCharsetMapper();
-
-
-	public String getPath();
-
-
-	public Logger getLogger();
 
 }

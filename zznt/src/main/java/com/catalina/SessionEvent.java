@@ -1,13 +1,13 @@
 /*
- * $Header: /home/cvs/jakarta-tomcat-4.0/catalina/src/share/org/apache/catalina/Context.java,v 1.21 2002/05/12 01:22:18 glenn Exp $
- * $Revision: 1.21 $
- * $Date: 2002/05/12 01:22:18 $
+ * $Header: /home/cvs/jakarta-tomcat-4.0/catalina/src/share/org/apache/catalina/SessionEvent.java,v 1.1 2001/07/29 03:43:54 craigmcc Exp $
+ * $Revision: 1.1 $
+ * $Date: 2001/07/29 03:43:54 $
  *
  * ====================================================================
  *
  * The Apache Software License, Version 1.1
  *
- * Copyright (c) 1999 The Apache Software Foundation.  All rights
+ * Copyright (c) 1999-2001 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -64,97 +64,95 @@
 
 package com.catalina;
 
-import java.util.logging.Logger;
 
-import javax.servlet.ServletContext;
+import java.util.EventObject;
 
-import com.util.CharsetMapper;
 
 /**
- * A <b>Context</b> is a Container that represents a servlet context, and
- * therefore an individual web application, in the Catalina servlet engine.
- * It is therefore useful in almost every deployment of Catalina (even if a
- * Connector attached to a web server (such as Apache) uses the web server's
- * facilities to identify the appropriate Wrapper to handle this request.
- * It also provides a convenient mechanism to use Interceptors that see
- * every request processed by this particular web application.
- * <p>
- * The parent Container attached to a Context is generally a Host, but may
- * be some other implementation, or may be omitted if it is not necessary.
- * <p>
- * The child containers attached to a Context are generally implementations
- * of Wrapper (representing individual servlet definitions).
- * <p>
+ * General event for notifying listeners of significant changes on a Session.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.21 $ $Date: 2002/05/12 01:22:18 $
+ * @version $Revision: 1.1 $ $Date: 2001/07/29 03:43:54 $
  */
 
-public interface Context extends Container {
-
-
-    // ----------------------------------------------------- Manifest Constants
+public final class SessionEvent
+    extends EventObject {
 
 
     /**
-     * The LifecycleEvent type sent when a context is reloaded.
+     * The event data associated with this event.
      */
-    public static final String RELOAD_EVENT = "reload";
-
-
-    // ------------------------------------------------------------- Properties
+    private Object data = null;
 
 
     /**
-     * Return the set of initialized application listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
+     * The Session on which this event occurred.
+     */
+    private Session session = null;
+
+
+    /**
+     * The event type this instance represents.
+     */
+    private String type = null;
+
+
+    /**
+     * Construct a new SessionEvent with the specified parameters.
      *
-     * @exception IllegalStateException if this method is called before
-     *  this application has started, or after it has been stopped
+     * @param session Session on which this event occurred
+     * @param type Event type
+     * @param data Event data
      */
-    public Object[] getApplicationListeners();
+    public SessionEvent(Session session, String type, Object data) {
+
+        super(session);
+        this.session = session;
+        this.type = type;
+        this.data = data;
+
+    }
 
 
     /**
-     * Store the set of initialized application listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
-     *
-     * @param listeners The set of instantiated listener objects.
+     * Return the event data of this event.
      */
-    public void setApplicationListeners(Object listeners[]);
+    public Object getData() {
+
+        return (this.data);
+
+    }
 
 
     /**
-     * Return the application available flag for this Context.
+     * Return the Session on which this event occurred.
      */
-    public boolean getAvailable();
+    public Session getSession() {
+
+        return (this.session);
+
+    }
 
 
     /**
-     * Set the application available flag for this Context.
-     *
-     * @param available The new application available flag
+     * Return the event type of this event.
      */
-    public void setAvailable(boolean available);
+    public String getType() {
+
+        return (this.type);
+
+    }
 
 
-	public ServletContext getServletContext();
+    /**
+     * Return a string representation of this event.
+     */
+    public String toString() {
 
+        return ("SessionEvent['" + getSession() + "','" +
+                getType() + "']");
 
-	public Manager getManager();
+    }
 
-
-	public boolean getCookies();
-
-
-	public CharsetMapper getCharsetMapper();
-
-
-	public String getPath();
-
-
-	public Logger getLogger();
 
 }

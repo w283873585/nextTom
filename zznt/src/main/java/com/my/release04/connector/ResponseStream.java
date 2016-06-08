@@ -1,10 +1,15 @@
 package com.my.release04.connector;
 
+
 import java.io.IOException;
 import java.io.OutputStream;
+
 import javax.servlet.ServletOutputStream;
 
-import com.my.release03.connector.http.HttpResponse;
+import com.catalina.Response;
+import com.my.release04.connector.http.Constants;
+import com.util.StringManager;
+
 
 /**
  * Convenience implementation of <b>ServletOutputStream</b> that works with
@@ -17,7 +22,8 @@ import com.my.release03.connector.http.HttpResponse;
  * @deprecated
  */
 
-public class ResponseStream extends ServletOutputStream {
+public class ResponseStream
+    extends ServletOutputStream {
 
 
     // ----------------------------------------------------------- Constructors
@@ -28,14 +34,15 @@ public class ResponseStream extends ServletOutputStream {
      *
      * @param response The associated response
      */
-    public ResponseStream(HttpResponse response) {
+    public ResponseStream(Response response) {
 
         super();
         closed = false;
         commit = false;
         count = 0;
         this.response = response;
-      //  this.stream = response.getStream();
+        this.stream = response.getStream();
+        this.suspended = response.isSuspended();
 
     }
 
@@ -71,7 +78,14 @@ public class ResponseStream extends ServletOutputStream {
     /**
      * The Response with which this input stream is associated.
      */
-    protected HttpResponse response = null;
+    protected Response response = null;
+
+
+    /**
+     * The localized strings for this package.
+     */
+    protected static StringManager sm =
+        StringManager.getManager(Constants.Package);
 
 
     /**
@@ -80,13 +94,19 @@ public class ResponseStream extends ServletOutputStream {
     protected OutputStream stream = null;
 
 
+    /**
+     * Has this response output been suspended?
+     */
+    protected boolean suspended = false;
+
+
     // ------------------------------------------------------------- Properties
 
 
     /**
      * [Package Private] Return the "commit response on flush" flag.
      */
-    public boolean getCommit() {
+    boolean getCommit() {
 
         return (this.commit);
 
@@ -98,9 +118,29 @@ public class ResponseStream extends ServletOutputStream {
      *
      * @param commit The new commit flag
      */
-    public void setCommit(boolean commit) {
+    void setCommit(boolean commit) {
 
         this.commit = commit;
+
+    }
+
+
+    /**
+     * Set the suspended flag.
+     */
+    void setSuspended(boolean suspended) {
+
+        this.suspended = suspended;
+
+    }
+
+
+    /**
+     * Suspended flag accessor.
+     */
+    boolean isSuspended() {
+
+        return (this.suspended);
 
     }
 
@@ -113,10 +153,17 @@ public class ResponseStream extends ServletOutputStream {
      * any further output data to throw an IOException.
      */
     public void close() throws IOException {
+
+        if (suspended)
+            throw new IOException
+                (sm.getString("responseStream.suspended"));
+
         if (closed)
-            throw new IOException("responseStream.close.closed");
-        response.flushBuffer();
+            throw new IOException(sm.getString("responseStream.close.closed"));
+
+        response.getResponse().flushBuffer();
         closed = true;
+
     }
 
 
@@ -124,11 +171,17 @@ public class ResponseStream extends ServletOutputStream {
      * Flush any buffered data for this output stream, which also causes the
      * response to be committed.
      */
-  public void flush() throws IOException {
-    if (closed)
-            throw new IOException("responseStream.flush.closed");
-       if (commit)
-            response.flushBuffer();
+    public void flush() throws IOException {
+
+        if (suspended)
+            throw new IOException
+                (sm.getString("responseStream.suspended"));
+
+        if (closed)
+            throw new IOException(sm.getString("responseStream.flush.closed"));
+
+        if (commit)
+            response.getResponse().flushBuffer();
 
     }
 
@@ -142,35 +195,64 @@ public class ResponseStream extends ServletOutputStream {
      */
     public void write(int b) throws IOException {
 
+        if (suspended)
+            return;
+
         if (closed)
-            throw new IOException("responseStream.write.closed");
+            throw new IOException(sm.getString("responseStream.write.closed"));
 
         if ((length > 0) && (count >= length))
-            throw new IOException("responseStream.write.count");
+            throw new IOException(sm.getString("responseStream.write.count"));
 
-        response.write(b);
+        ((ResponseBase) response).write(b);
         count++;
 
     }
 
 
+    /**
+     * Write <code>b.length</code> bytes from the specified byte array
+     * to our output stream.
+     *
+     * @param b The byte array to be written
+     *
+     * @exception IOException if an input/output error occurs
+     */
     public void write(byte b[]) throws IOException {
+
+        if (suspended)
+            return;
+
         write(b, 0, b.length);
 
     }
 
 
+    /**
+     * Write <code>len</code> bytes from the specified byte array, starting
+     * at the specified offset, to our output stream.
+     *
+     * @param b The byte array containing the bytes to be written
+     * @param off Zero-relative starting offset of the bytes to be written
+     * @param len The number of bytes to be written
+     *
+     * @exception IOException if an input/output error occurs
+     */
     public void write(byte b[], int off, int len) throws IOException {
+
+        if (suspended)
+            return;
+
         if (closed)
-            throw new IOException("responseStream.write.closed");
+            throw new IOException(sm.getString("responseStream.write.closed"));
 
         int actual = len;
         if ((length > 0) && ((count + len) >= length))
             actual = length - count;
-        response.write(b, off, actual);
+        ((ResponseBase) response).write(b, off, actual);
         count += actual;
         if (actual < len)
-            throw new IOException("responseStream.write.count");
+            throw new IOException(sm.getString("responseStream.write.count"));
 
     }
 
@@ -182,6 +264,7 @@ public class ResponseStream extends ServletOutputStream {
      * Has this response stream been closed?
      */
     boolean closed() {
+
         return (this.closed);
 
     }
@@ -198,4 +281,3 @@ public class ResponseStream extends ServletOutputStream {
 
 
 }
-

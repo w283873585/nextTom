@@ -1,14 +1,10 @@
 package com.catalina;
 
 
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import javax.servlet.ServletException;
 
 import com.my.release04.connector.http.HttpRequestImpl;
 import com.my.release04.connector.http.HttpResponseImpl;
-
-import javax.naming.directory.DirContext;
 
 
 /**

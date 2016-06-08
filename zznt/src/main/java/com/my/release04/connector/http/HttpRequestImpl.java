@@ -1,342 +1,352 @@
 package com.my.release04.connector.http;
 
+
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
-import java.net.Socket;
-import java.security.Principal;
-import java.util.Iterator;
-import java.util.Locale;
-
+import java.util.ArrayList;
+import java.util.Enumeration;
 import javax.servlet.ServletInputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.http.Cookie;
 
-import com.catalina.Connector;
-import com.catalina.Context;
-import com.catalina.Request;
-import com.catalina.Response;
-import com.catalina.Wrapper;
+import com.my.release04.connector.HttpRequestBase;
+import com.util.Enumerator;
 
-public class HttpRequestImpl implements HttpRequest{
 
-	@Override
-	public String getAuthorization() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+/**
+ * Implementation of <b>HttpRequest</b> specific to the HTTP connector.
+ *
+ * @author Craig R. McClanahan
+ * @author Remy Maucherat
+ * @version $Revision: 1.13 $ $Date: 2002/03/18 07:15:40 $
+ * @deprecated
+ */
 
-	@Override
-	public void setAuthorization(String authorization) {
-		// TODO Auto-generated method stub
-		
-	}
+public final class HttpRequestImpl
+    extends HttpRequestBase {
 
-	@Override
-	public Connector getConnector() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public void setConnector(Connector connector) {
-		// TODO Auto-generated method stub
-		
-	}
+    // -------------------------------------------------------------- Constants
 
-	@Override
-	public Context getContext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public void setContext(Context context) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Initial pool size.
+     */
+    protected static final int INITIAL_POOL_SIZE = 10;
 
-	@Override
-	public String getInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public ServletRequest getRequest() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Pool size increment.
+     */
+    protected static final int POOL_SIZE_INCREMENT = 5;
 
-	@Override
-	public Response getResponse() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public void setResponse(Response response) {
-		// TODO Auto-generated method stub
-		
-	}
+    // ----------------------------------------------------- Instance Variables
 
-	@Override
-	public Socket getSocket() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public void setSocket(Socket socket) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * The InetAddress of the remote client of ths request.
+     */
+    protected InetAddress inet = null;
 
-	@Override
-	public InputStream getStream() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public void setStream(InputStream stream) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Descriptive information about this Request implementation.
+     */
+    protected static final String info =
+        "org.apache.catalina.connector.http.HttpRequestImpl/1.0";
 
-	@Override
-	public Wrapper getWrapper() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public void setWrapper(Wrapper wrapper) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Headers pool.
+     */
+    protected HttpHeader[] headerPool = new HttpHeader[INITIAL_POOL_SIZE];
 
-	@Override
-	public ServletInputStream createInputStream() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public void finishRequest() throws IOException {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Position of the next available header in the pool.
+     */
+    protected int nextHeader = 0;
 
-	@Override
-	public Object getNote(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public Iterator getNoteNames() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Connection header.
+     */
+    protected HttpHeader connectionHeader = null;
 
-	@Override
-	public void recycle() {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void removeNote(String name) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Transfer encoding header.
+     */
+    protected HttpHeader transferEncodingHeader = null;
 
-	@Override
-	public void setContentLength(int length) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void setContentType(String type) {
-		// TODO Auto-generated method stub
-		
-	}
+    // ------------------------------------------------------------- Properties
 
-	@Override
-	public void setNote(String name, Object value) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void setProtocol(String protocol) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * [Package Private] Return the InetAddress of the remote client of
+     * this request.
+     */
+    InetAddress getInet() {
 
-	@Override
-	public void setRemoteAddr(String remote) {
-		// TODO Auto-generated method stub
-		
-	}
+        return (inet);
 
-	@Override
-	public void setScheme(String scheme) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	@Override
-	public void setSecure(boolean secure) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void setServerName(String name) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * [Package Private] Set the InetAddress of the remote client of
+     * this request.
+     *
+     * @param inet The new InetAddress
+     */
+    void setInet(InetAddress inet) {
 
-	@Override
-	public void setServerPort(int port) {
-		// TODO Auto-generated method stub
-		
-	}
+        this.inet = inet;
 
-	public void setQueryString(String substring) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	public void setRequestedSessionId(String substring) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	public void setRequestedSessionURL(boolean b) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Return descriptive information about this Request implementation and
+     * the corresponding version number, in the format
+     * <code>&lt;description&gt;/&lt;version&gt;</code>.
+     */
+    public String getInfo() {
 
-	@Override
-	public void addCookie(Cookie cookie) {
-		// TODO Auto-generated method stub
-		
-	}
+        return (info);
 
-	@Override
-	public void addHeader(String name, String value) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	@Override
-	public void addLocale(Locale locale) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void addParameter(String name, String[] values) {
-		// TODO Auto-generated method stub
-		
-	}
+    // --------------------------------------------------------- Public Methods
 
-	@Override
-	public void clearCookies() {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void clearHeaders() {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Release all object references, and initialize instance variables, in
+     * preparation for reuse of this object.
+     */
+    public void recycle() {
 
-	@Override
-	public void clearLocales() {
-		// TODO Auto-generated method stub
-		
-	}
+        super.recycle();
+        inet = null;
+        nextHeader = 0;
+        connectionHeader = null;
 
-	@Override
-	public void clearParameters() {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	@Override
-	public void setAuthType(String type) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void setContextPath(String path) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Create and return a ServletInputStream to read the content
+     * associated with this Request.  The default implementation creates an
+     * instance of RequestStream associated with this request, but this can
+     * be overridden if necessary.
+     *
+     * @exception IOException if an input/output error occurs
+     */
+    public ServletInputStream createInputStream() throws IOException {
 
-	@Override
-	public void setMethod(String method) {
-		// TODO Auto-generated method stub
-		
-	}
+        return (new HttpRequestStream(this, (HttpResponseImpl) response));
 
-	@Override
-	public void setPathInfo(String path) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	@Override
-	public void setRequestedSessionCookie(boolean flag) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void setRequestURI(String uri) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Allocate new header.
+     *
+     * @return an HttpHeader buffer allocated from the pool
+     */
+    HttpHeader allocateHeader() {
+        if (nextHeader == headerPool.length) {
+            // Grow the pool
+            HttpHeader[] newHeaderPool =
+                new HttpHeader[headerPool.length + POOL_SIZE_INCREMENT];
+            for (int i = 0; i < nextHeader; i++) {
+                newHeaderPool[i] = headerPool[i];
+            }
+            headerPool = newHeaderPool;
+        }
+        if (headerPool[nextHeader] == null)
+            headerPool[nextHeader] = new HttpHeader();
+        return headerPool[nextHeader];
+    }
 
-	@Override
-	public void setDecodedRequestURI(String uri) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public String getDecodedRequestURI() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /**
+     * Go to the next header.
+     */
+    void nextHeader() {
+        nextHeader++;
+    }
 
-	@Override
-	public void setServletPath(String path) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void setUserPrincipal(Principal principal) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * Add a Header to the set of Headers associated with this Request.
+     *
+     * @param name The new header name
+     * @param value The new header value
+     * @deprecated Don't use
+     */
+    public void addHeader(String name, String value) {
 
-	public void setInet(InetAddress inetAddress) {
-		// TODO Auto-generated method stub
-		
-	}
+        if (nextHeader == headerPool.length) {
+            // Grow the pool
+            HttpHeader[] newHeaderPool =
+                new HttpHeader[headerPool.length + POOL_SIZE_INCREMENT];
+            for (int i = 0; i < nextHeader; i++) {
+                newHeaderPool[i] = headerPool[i];
+            }
+            headerPool = newHeaderPool;
+        }
+        headerPool[nextHeader++] = new HttpHeader(name, value);
 
-	public boolean isRequestedSessionIdFromCookie() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    }
+
+
+    /**
+     * Clear the collection of Headers associated with this Request.
+     */
+    public void clearHeaders() {
+
+        nextHeader = 0;
+
+    }
+
+
+    /**
+     * Return the first value of the specified header, if any; otherwise,
+     * return <code>null</code>
+     *
+     * @param header Header we want to retrieve
+     */
+    public HttpHeader getHeader(HttpHeader header) {
+
+        for (int i = 0; i < nextHeader; i++) {
+            if (headerPool[i].equals(header))
+                return headerPool[i];
+        }
+        return null;
+
+    }
+
+
+    /**
+     * Return the first value of the specified header, if any; otherwise,
+     * return <code>null</code>
+     *
+     * @param headerName Name of the requested header
+     */
+    public HttpHeader getHeader(char[] headerName) {
+
+        for (int i = 0; i < nextHeader; i++) {
+            if (headerPool[i].equals(headerName))
+                return headerPool[i];
+        }
+        return null;
+
+    }
+
+
+    /**
+     * Perform whatever actions are required to flush and close the input
+     * stream or reader, in a single operation.
+     *
+     * @exception IOException if an input/output error occurs
+     */
+    public void finishRequest() throws IOException {
+
+        // If neither a reader or an is have been opened, do it to consume
+        // request bytes, if any
+        if ((reader == null) && (stream == null) && (getContentLength() != 0)
+            && (getProtocol() != null) && (getProtocol().equals("HTTP/1.1")))
+            getInputStream();
+
+        super.finishRequest();
+
+    }
+
+
+    // ------------------------------------------------- ServletRequest Methods
+
+
+    /**
+     * Return the Internet Protocol (IP) address of the client that sent
+     * this request.
+     */
+    public String getRemoteAddr() {
+
+        return (inet.getHostAddress());
+
+    }
+
+
+    /**
+     * Return the fully qualified name of the client that sent this request,
+     * or the IP address of the client if the name cannot be determined.
+     */
+    public String getRemoteHost() {
+
+        if (connector.getEnableLookups())
+            return (inet.getHostName());
+        else
+            return (getRemoteAddr());
+
+    }
+
+
+    // --------------------------------------------- HttpServletRequest Methods
+
+
+    /**
+     * Return the first value of the specified header, if any; otherwise,
+     * return <code>null</code>
+     *
+     * @param name Name of the requested header
+     */
+    public String getHeader(String name) {
+
+        name = name.toLowerCase();
+        for (int i = 0; i < nextHeader; i++) {
+            if (headerPool[i].equals(name))
+                return new String(headerPool[i].value, 0,
+                                  headerPool[i].valueEnd);
+        }
+        return null;
+
+
+    }
+
+
+    /**
+     * Return all of the values of the specified header, if any; otherwise,
+     * return an empty enumeration.
+     *
+     * @param name Name of the requested header
+     */
+    public Enumeration getHeaders(String name) {
+
+        name = name.toLowerCase();
+        ArrayList tempArrayList = new ArrayList();
+        for (int i = 0; i < nextHeader; i++) {
+            if (headerPool[i].equals(name))
+                tempArrayList.add(new String(headerPool[i].value, 0,
+                                             headerPool[i].valueEnd));
+        }
+        return (Enumeration) new Enumerator(tempArrayList);
+
+    }
+
+
+    /**
+     * Return the names of all headers received with this request.
+     */
+    public Enumeration getHeaderNames() {
+        ArrayList tempArrayList = new ArrayList();
+        for (int i = 0; i < nextHeader; i++) {
+            tempArrayList.add(new String(headerPool[i].name, 0,
+                                         headerPool[i].nameEnd));
+        }
+        return (Enumeration) new Enumerator(tempArrayList);
+
+    }
 
 }
