@@ -121,6 +121,9 @@ public interface Container {
 	public void invoke(Request request, Response response) throws ServletException, IOException;
 
 
+	public Loader getLoader();
+
+
     /**
      * Return the Loader with which this Container is associated.  If there is
      * no associated Loader, return the Loader associated with our parent

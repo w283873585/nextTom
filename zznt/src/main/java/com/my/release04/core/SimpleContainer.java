@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.catalina.Container;
+import com.catalina.Loader;
 import com.catalina.Request;
 import com.catalina.Response;
 
@@ -65,4 +66,8 @@ public class SimpleContainer implements Container {
       System.out.println(e.toString());
     }
   }
+
+	public Loader getLoader() {
+		return null;
+	}
 }

@@ -197,6 +197,14 @@ public interface Wrapper extends Container {
 
 
     /**
+     * Add a new listener interested in InstanceEvents.
+     *
+     * @param listener The new listener
+     */
+//    public void addInstanceListener(InstanceListener listener);
+
+
+    /**
      * Add a new security role reference record to the set of records for
      * this servlet.
      *
@@ -288,6 +296,13 @@ public interface Wrapper extends Container {
     public void removeInitParameter(String name);
 
 
+    /**
+     * Remove a listener no longer interested in InstanceEvents.
+     *
+     * @param listener The listener to remove
+     */
+//    public void removeInstanceListener(InstanceListener listener);
+
 
     /**
      * Remove any security role reference for the specified role name.
@@ -319,4 +334,13 @@ public interface Wrapper extends Container {
     public void unload() throws ServletException;
 
 
+	public void setLoader(Loader loader);
+
+
+	public void setName(String string);
+
+	public String getName();
+
+
+	public void setParent(Container container);
 }

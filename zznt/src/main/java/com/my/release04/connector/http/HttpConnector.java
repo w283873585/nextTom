@@ -78,7 +78,7 @@ public class HttpConnector implements Runnable, Connector, Lifecycle {
 	        StringManager.getManager(Constants.Package);
     
     
-	public HttpConnector() throws Exception {
+	public HttpConnector() {
 		super();
 	}
 

@@ -1,7 +1,7 @@
 /*
- * $Header: /home/cvs/jakarta-tomcat-4.0/catalina/src/share/org/apache/catalina/Context.java,v 1.21 2002/05/12 01:22:18 glenn Exp $
- * $Revision: 1.21 $
- * $Date: 2002/05/12 01:22:18 $
+ * $Header: /home/cvs/jakarta-tomcat-4.0/catalina/src/share/org/apache/catalina/Mapper.java,v 1.3 2001/07/22 20:13:30 pier Exp $
+ * $Revision: 1.3 $
+ * $Date: 2001/07/22 20:13:30 $
  *
  * ====================================================================
  *
@@ -64,112 +64,69 @@
 
 package com.catalina;
 
-import java.util.logging.Logger;
-
-import javax.servlet.ServletContext;
-
-import com.util.CharsetMapper;
 
 /**
- * A <b>Context</b> is a Container that represents a servlet context, and
- * therefore an individual web application, in the Catalina servlet engine.
- * It is therefore useful in almost every deployment of Catalina (even if a
- * Connector attached to a web server (such as Apache) uses the web server's
- * facilities to identify the appropriate Wrapper to handle this request.
- * It also provides a convenient mechanism to use Interceptors that see
- * every request processed by this particular web application.
+ * Interface defining methods that a parent Container may implement to select
+ * a subordinate Container to process a particular Request, optionally
+ * modifying the properties of the Request to reflect the selections made.
  * <p>
- * The parent Container attached to a Context is generally a Host, but may
- * be some other implementation, or may be omitted if it is not necessary.
- * <p>
- * The child containers attached to a Context are generally implementations
- * of Wrapper (representing individual servlet definitions).
- * <p>
+ * A typical Container may be associated with a single Mapper that processes
+ * all requests to that Container, or a Mapper per request protocol that allows
+ * the same Container to support multiple protocols at once.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.21 $ $Date: 2002/05/12 01:22:18 $
+ * @version $Revision: 1.3 $ $Date: 2001/07/22 20:13:30 $
  */
 
-public interface Context extends Container {
-
-
-    // ----------------------------------------------------- Manifest Constants
-
-
-    /**
-     * The LifecycleEvent type sent when a context is reloaded.
-     */
-    public static final String RELOAD_EVENT = "reload";
+public interface Mapper {
 
 
     // ------------------------------------------------------------- Properties
 
 
     /**
-     * Return the set of initialized application listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
-     *
-     * @exception IllegalStateException if this method is called before
-     *  this application has started, or after it has been stopped
+     * Return the Container with which this Mapper is associated.
      */
-    public Object[] getApplicationListeners();
+    public Container getContainer();
 
 
     /**
-     * Store the set of initialized application listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
+     * Set the Container with which this Mapper is associated.
      *
-     * @param listeners The set of instantiated listener objects.
+     * @param container The newly associated Container
+     *
+     * @exception IllegalArgumentException if this Container is not
+     *  acceptable to this Mapper
      */
-    public void setApplicationListeners(Object listeners[]);
+    public void setContainer(Container container);
 
 
     /**
-     * Return the application available flag for this Context.
+     * Return the protocol for which this Mapper is responsible.
      */
-    public boolean getAvailable();
+    public String getProtocol();
 
 
     /**
-     * Set the application available flag for this Context.
+     * Set the protocol for which this Mapper is responsible.
      *
-     * @param available The new application available flag
+     * @param protocol The newly associated protocol
      */
-    public void setAvailable(boolean available);
+    public void setProtocol(String protocol);
 
 
-	public ServletContext getServletContext();
+    // --------------------------------------------------------- Public Methods
 
 
-	public Manager getManager();
+    /**
+     * Return the child Container that should be used to process this Request,
+     * based upon its characteristics.  If no such child Container can be
+     * identified, return <code>null</code> instead.
+     *
+     * @param request Request being processed
+     * @param update Update the Request to reflect the mapping selection?
+     */
+    public Wrapper map(Request request, boolean update);
 
-
-	public boolean getCookies();
-
-
-	public CharsetMapper getCharsetMapper();
-
-
-	public String getPath();
-
-
-	public Logger getLogger();
-
-
-	public void addChild(Wrapper wrapper1);
-
-
-	public void addMapper(Mapper mapper);
-
-
-	public void setLoader(Loader loader);
-
-
-	public void addServletMapping(String string, String string2);
-
-
-	public Wrapper map(Request request, boolean b);
 
 }
