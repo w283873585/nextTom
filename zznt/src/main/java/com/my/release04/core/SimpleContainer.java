@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.catalina.Container;
 import com.catalina.Loader;
+import com.catalina.Mapper;
 import com.catalina.Request;
 import com.catalina.Response;
 
@@ -69,5 +70,95 @@ public class SimpleContainer implements Container {
 
 	public Loader getLoader() {
 		return null;
+	}
+
+	@Override
+	public void setLoader(Loader loader) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Container getParent() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setParent(Container container) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setParentClassLoader(ClassLoader parent) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addChild(Container child) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addMapper(Mapper mapper) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Container findChild(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Container[] findChildren() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Mapper findMapper(String protocol) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Mapper[] findMappers() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Container map(Request request, boolean update) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void removeChild(Container child) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void removeMapper(Mapper mapper) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setName(String name) {
+		// TODO Auto-generated method stub
+		
 	}
 }

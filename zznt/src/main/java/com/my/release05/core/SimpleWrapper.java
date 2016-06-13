@@ -8,6 +8,7 @@ import javax.servlet.UnavailableException;
 
 import com.catalina.Container;
 import com.catalina.Loader;
+import com.catalina.Mapper;
 import com.catalina.Pipeline;
 import com.catalina.Request;
 import com.catalina.Response;
@@ -74,6 +75,7 @@ public class SimpleWrapper implements Wrapper, Pipeline{
 		    throw new ServletException("servlet class has not been specified");
 		}
 		
+		Loader loader = getLoader();
 		if (loader == null)
 			throw new ServletException("No loader.");
 		
@@ -271,5 +273,56 @@ public class SimpleWrapper implements Wrapper, Pipeline{
 	@Override
 	public void setParent(Container container) {
 		this.parent = container;
+	}
+
+	@Override
+	public Container getParent() {
+		return null;
+	}
+
+	@Override
+	public void setParentClassLoader(ClassLoader parent) {
+	}
+
+	@Override
+	public void addChild(Container child) {
+	}
+
+	@Override
+	public void addMapper(Mapper mapper) {
+	}
+
+	@Override
+	public Container findChild(String name) {
+		return null;
+	}
+
+	@Override
+	public Container[] findChildren() {
+		return null;
+	}
+
+	@Override
+	public Mapper findMapper(String protocol) {
+		return null;
+	}
+
+	@Override
+	public Mapper[] findMappers() {
+		return null;
+	}
+
+	@Override
+	public Container map(Request request, boolean update) {
+		return null;
+	}
+
+	@Override
+	public void removeChild(Container child) {
+		
+	}
+
+	@Override
+	public void removeMapper(Mapper mapper) {
 	}
 }

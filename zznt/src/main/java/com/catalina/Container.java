@@ -118,18 +118,12 @@ public interface Container {
     public String getInfo();
 
 
-	public void invoke(Request request, Response response) throws ServletException, IOException;
-
-
-	public Loader getLoader();
-
-
     /**
      * Return the Loader with which this Container is associated.  If there is
      * no associated Loader, return the Loader associated with our parent
      * Container (if any); otherwise, return <code>null</code>.
      */
-//    public Loader getLoader();
+	public Loader getLoader();
 //
 //
 //    /**
@@ -137,7 +131,7 @@ public interface Container {
 //     *
 //     * @param loader The newly associated loader
 //     */
-//    public void setLoader(Loader loader);
+	public void setLoader(Loader loader);
 
 //
 //    /**
@@ -193,7 +187,7 @@ public interface Container {
 //     * Container.  Within the set of child containers belonging to a particular
 //     * parent, Container names must be unique.
 //     */
-//    public String getName();
+    public String getName();
 //
 //
 //    /**
@@ -207,14 +201,14 @@ public interface Container {
 //     *  added to the children of a parent Container (after which the name
 //     *  may not be changed)
 //     */
-//    public void setName(String name);
+    public void setName(String name);
 //
 //
 //    /**
 //     * Return the Container for which this Container is a child, if there is
 //     * one.  If there is no defined parent, return <code>null</code>.
 //     */
-//    public Container getParent();
+    public Container getParent();
 //
 //
 //    /**
@@ -228,7 +222,7 @@ public interface Container {
 //     * @exception IllegalArgumentException if this Container refuses to become
 //     *  attached to the specified Container
 //     */
-//    public void setParent(Container container);
+    public void setParent(Container container);
 //
 //
 //    /**
@@ -245,7 +239,7 @@ public interface Container {
 //     *
 //     * @param parent The new parent class loader
 //     */
-//    public void setParentClassLoader(ClassLoader parent);
+    public void setParentClassLoader(ClassLoader parent);
 //
 //
 //    /**
@@ -300,7 +294,7 @@ public interface Container {
 //     * @exception IllegalStateException if this Container does not support
 //     *  child Containers
 //     */
-//    public void addChild(Container child);
+    public void addChild(Container child);
 //
 //
 //    /**
@@ -319,7 +313,7 @@ public interface Container {
 //     * @exception IllegalArgumentException if this exception is thrown by
 //     *  the <code>setContainer()</code> method of the Mapper
 //     */
-//    public void addMapper(Mapper mapper);
+    public void addMapper(Mapper mapper);
 //
 //
 //    /**
@@ -336,14 +330,14 @@ public interface Container {
 //     *
 //     * @param name Name of the child Container to be retrieved
 //     */
-//    public Container findChild(String name);
+    public Container findChild(String name);
 //
 //
 //    /**
 //     * Return the set of children Containers associated with this Container.
 //     * If this Container has no children, a zero-length array is returned.
 //     */
-//    public Container[] findChildren();
+    public Container[] findChildren();
 //
 //
 //    /**
@@ -361,14 +355,14 @@ public interface Container {
 //     *
 //     * @param protocol Protocol for which to find a Mapper
 //     */
-//    public Mapper findMapper(String protocol);
+    public Mapper findMapper(String protocol);
 //
 //
 //    /**
 //     * Return the set of Mappers associated with this Container.  If this
 //     * Container has no Mappers, a zero-length array is returned.
 //     */
-//    public Mapper[] findMappers();
+    public Mapper[] findMappers();
 //
 //
 //    /**
@@ -383,8 +377,8 @@ public interface Container {
 //     * @exception ServletException if a ServletException was thrown
 //     *  while processing this request
 //     */
-//    public void invoke(Request request, Response response)
-//        throws IOException, ServletException;
+    public void invoke(Request request, Response response)
+        throws IOException, ServletException;
 //
 //
 //    /**
@@ -395,7 +389,7 @@ public interface Container {
 //     * @param request Request being processed
 //     * @param update Update the Request to reflect the mapping selection?
 //     */
-//    public Container map(Request request, boolean update);
+    public Container map(Request request, boolean update);
 //
 //
 //    /**
@@ -404,7 +398,7 @@ public interface Container {
 //     *
 //     * @param child Existing child Container to be removed
 //     */
-//    public void removeChild(Container child);
+    public void removeChild(Container child);
 //
 //
 //    /**
@@ -420,7 +414,7 @@ public interface Container {
 //     *
 //     * @param mapper The Mapper to be removed
 //     */
-//    public void removeMapper(Mapper mapper);
+    public void removeMapper(Mapper mapper);
 //
 //
 //    /**

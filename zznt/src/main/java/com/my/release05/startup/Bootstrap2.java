@@ -17,6 +17,7 @@ import com.my.release05.valves.HeaderLoggerValve;
 public final class Bootstrap2 {
   public static void main(String[] args) {
     HttpConnector connector = new HttpConnector();
+    
     Wrapper wrapper1 = new SimpleWrapper();
     wrapper1.setName("Primitive");
     wrapper1.setServletClass("PrimitiveServlet");

@@ -64,8 +64,6 @@
 
 package com.catalina;
 
-import java.util.logging.Logger;
-
 import javax.servlet.ServletContext;
 
 import com.util.CharsetMapper;
@@ -151,25 +149,9 @@ public interface Context extends Container {
 
 	public CharsetMapper getCharsetMapper();
 
-
+	
 	public String getPath();
 
-
-	public Logger getLogger();
-
-
-	public void addChild(Wrapper wrapper1);
-
-
-	public void addMapper(Mapper mapper);
-
-
-	public void setLoader(Loader loader);
-
-
+	
 	public void addServletMapping(String string, String string2);
-
-
-	public Wrapper map(Request request, boolean b);
-
 }

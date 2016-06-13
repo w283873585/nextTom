@@ -333,14 +333,4 @@ public interface Wrapper extends Container {
      */
     public void unload() throws ServletException;
 
-
-	public void setLoader(Loader loader);
-
-
-	public void setName(String string);
-
-	public String getName();
-
-
-	public void setParent(Container container);
 }
