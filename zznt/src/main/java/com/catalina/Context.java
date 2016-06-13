@@ -66,6 +66,7 @@ package com.catalina;
 
 import javax.servlet.ServletContext;
 
+import com.catalina.logger.FileLogger;
 import com.util.CharsetMapper;
 
 /**
@@ -154,4 +155,5 @@ public interface Context extends Container {
 
 	
 	public void addServletMapping(String string, String string2);
+
 }

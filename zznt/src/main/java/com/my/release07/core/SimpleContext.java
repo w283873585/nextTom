@@ -1,4 +1,4 @@
-package com.my.release06.core;
+package com.my.release07.core;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -37,6 +37,8 @@ public class SimpleContext implements Context, Pipeline, Lifecycle {
 	protected HashMap mappers = new HashMap();
 	private Container parent = null;
 	protected boolean started = false;
+	
+	private Logger logger = null;
 	
 	
 	@Override
@@ -234,6 +236,10 @@ public class SimpleContext implements Context, Pipeline, Lifecycle {
 
 	@Override
 	public void start() throws LifecycleException {
+		
+		System.out.println(System.getProperty("user.dir"));
+		log("context started");
+		
 		if (started)
 		      throw new LifecycleException("SimpleContext has already started");
 		
@@ -327,13 +333,16 @@ public class SimpleContext implements Context, Pipeline, Lifecycle {
 
 	@Override
 	public Logger getLogger() {
-		// TODO Auto-generated method stub
-		return null;
+		return logger;
 	}
 
 	@Override
 	public void setLogger(Logger logger) {
-		// TODO Auto-generated method stub
-		
+		this.logger = logger;
+	}
+	
+	private void log(String msg) {
+		if (this.logger != null)
+			logger.log(msg);
 	}
 }

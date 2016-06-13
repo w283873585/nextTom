@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import com.catalina.Container;
 import com.catalina.Context;
 import com.catalina.Loader;
+import com.catalina.Logger;
 import com.catalina.Manager;
 import com.catalina.Mapper;
 import com.catalina.Pipeline;
@@ -222,4 +223,16 @@ public class SimpleContext implements Context, Pipeline {
 	  public void removeValve(Valve valve) {
 	    pipeline.removeValve(valve);
 	  }
+
+	@Override
+	public Logger getLogger() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setLogger(Logger logger) {
+		// TODO Auto-generated method stub
+		
+	}
 }

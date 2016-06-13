@@ -139,7 +139,7 @@ public interface Container {
 //     * no associated Logger, return the Logger associated with our parent
 //     * Container (if any); otherwise return <code>null</code>.
 //     */
-//    public Logger getLogger();
+    public Logger getLogger();
 //
 //
 //    /**
@@ -147,7 +147,7 @@ public interface Container {
 //     *
 //     * @param logger The newly associated Logger
 //     */
-//    public void setLogger(Logger logger);
+    public void setLogger(Logger logger);
 //
 //
 //    /**

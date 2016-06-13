@@ -12,6 +12,7 @@ import com.catalina.LifecycleException;
 import com.catalina.LifecycleListener;
 import com.catalina.LifecycleSupport;
 import com.catalina.Loader;
+import com.catalina.Logger;
 import com.catalina.Mapper;
 import com.catalina.Pipeline;
 import com.catalina.Request;
@@ -406,6 +407,18 @@ public class SimpleWrapper implements Wrapper, Pipeline, Lifecycle{
 
 	    // Notify our interested LifecycleListeners
 	    lifecycle.fireLifecycleEvent(AFTER_STOP_EVENT, null);
+		
+	}
+
+	@Override
+	public Logger getLogger() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setLogger(Logger logger) {
+		// TODO Auto-generated method stub
 		
 	}
 }

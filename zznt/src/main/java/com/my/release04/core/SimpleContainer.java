@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.catalina.Container;
 import com.catalina.Loader;
+import com.catalina.Logger;
 import com.catalina.Mapper;
 import com.catalina.Request;
 import com.catalina.Response;
@@ -158,6 +159,18 @@ public class SimpleContainer implements Container {
 
 	@Override
 	public void setName(String name) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Logger getLogger() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setLogger(Logger logger) {
 		// TODO Auto-generated method stub
 		
 	}
