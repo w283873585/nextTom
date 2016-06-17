@@ -3,6 +3,7 @@ package com.my.release05.core;
 import java.io.IOException;
 import java.util.HashMap;
 
+import javax.naming.directory.DirContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
@@ -234,5 +235,23 @@ public class SimpleContext implements Context, Pipeline {
 	public void setLogger(Logger logger) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public DirContext getResources() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void reload() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean getReloadable() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

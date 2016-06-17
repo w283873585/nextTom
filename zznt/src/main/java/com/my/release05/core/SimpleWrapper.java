@@ -2,6 +2,7 @@ package com.my.release05.core;
 
 import java.io.IOException;
 
+import javax.naming.directory.DirContext;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -337,5 +338,11 @@ public class SimpleWrapper implements Wrapper, Pipeline{
 	public void setLogger(Logger logger) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public DirContext getResources() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

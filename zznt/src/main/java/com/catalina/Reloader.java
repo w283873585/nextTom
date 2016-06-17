@@ -1,7 +1,7 @@
 /*
- * $Header: /home/cvs/jakarta-tomcat-4.0/catalina/src/share/org/apache/catalina/Context.java,v 1.21 2002/05/12 01:22:18 glenn Exp $
- * $Revision: 1.21 $
- * $Date: 2002/05/12 01:22:18 $
+ * $Header: /home/cvs/jakarta-tomcat-4.0/catalina/src/share/org/apache/catalina/loader/Reloader.java,v 1.5 2001/07/22 20:25:10 pier Exp $
+ * $Revision: 1.5 $
+ * $Date: 2001/07/22 20:25:10 $
  *
  * ====================================================================
  *
@@ -64,103 +64,45 @@
 
 package com.catalina;
 
-import javax.servlet.ServletContext;
-
-import com.catalina.loader.WebappLoader;
-import com.catalina.logger.FileLogger;
-import com.util.CharsetMapper;
 
 /**
- * A <b>Context</b> is a Container that represents a servlet context, and
- * therefore an individual web application, in the Catalina servlet engine.
- * It is therefore useful in almost every deployment of Catalina (even if a
- * Connector attached to a web server (such as Apache) uses the web server's
- * facilities to identify the appropriate Wrapper to handle this request.
- * It also provides a convenient mechanism to use Interceptors that see
- * every request processed by this particular web application.
- * <p>
- * The parent Container attached to a Context is generally a Host, but may
- * be some other implementation, or may be omitted if it is not necessary.
- * <p>
- * The child containers attached to a Context are generally implementations
- * of Wrapper (representing individual servlet definitions).
- * <p>
+ * Internal interface that <code>ClassLoader</code> implementations may
+ * optionally implement to support the auto-reload functionality of
+ * the classloader associated with the context.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.21 $ $Date: 2002/05/12 01:22:18 $
+ * @version $Revision: 1.5 $ $Date: 2001/07/22 20:25:10 $
  */
 
-public interface Context extends Container {
-
-
-    // ----------------------------------------------------- Manifest Constants
+public interface Reloader {
 
 
     /**
-     * The LifecycleEvent type sent when a context is reloaded.
-     */
-    public static final String RELOAD_EVENT = "reload";
-
-
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Return the set of initialized application listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
+     * Add a new repository to the set of places this ClassLoader can look for
+     * classes to be loaded.
      *
-     * @exception IllegalStateException if this method is called before
-     *  this application has started, or after it has been stopped
-     */
-    public Object[] getApplicationListeners();
-
-
-    /**
-     * Store the set of initialized application listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
+     * @param repository Name of a source of classes to be loaded, such as a
+     *  directory pathname, a JAR file pathname, or a ZIP file pathname
      *
-     * @param listeners The set of instantiated listener objects.
+     * @exception IllegalArgumentException if the specified repository is
+     *  invalid or does not exist
      */
-    public void setApplicationListeners(Object listeners[]);
+    public void addRepository(String repository);
 
 
     /**
-     * Return the application available flag for this Context.
+     * Return a String array of the current repositories for this class
+     * loader.  If there are no repositories, a zero-length array is
+     * returned.
      */
-    public boolean getAvailable();
+    public String[] findRepositories();
 
 
     /**
-     * Set the application available flag for this Context.
-     *
-     * @param available The new application available flag
+     * Have one or more classes or resources been modified so that a reload
+     * is appropriate?
      */
-    public void setAvailable(boolean available);
+    public boolean modified();
 
-
-	public ServletContext getServletContext();
-
-
-	public Manager getManager();
-
-
-	public boolean getCookies();
-
-
-	public CharsetMapper getCharsetMapper();
-
-	
-	public String getPath();
-
-	
-	public void addServletMapping(String string, String string2);
-
-
-	public void reload();
-
-
-	public boolean getReloadable();
 
 }

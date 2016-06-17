@@ -4,6 +4,7 @@ package com.catalina;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 
+import javax.naming.directory.DirContext;
 import javax.servlet.ServletException;
 
 
@@ -425,4 +426,5 @@ public interface Container {
 //    public void removePropertyChangeListener(PropertyChangeListener listener);
 
 
+    public DirContext getResources();
 }

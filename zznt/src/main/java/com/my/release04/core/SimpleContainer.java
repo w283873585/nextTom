@@ -6,6 +6,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLStreamHandler;
 
+import javax.naming.directory.DirContext;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -173,5 +174,11 @@ public class SimpleContainer implements Container {
 	public void setLogger(Logger logger) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public DirContext getResources() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
