@@ -75,10 +75,10 @@ import com.catalina.Container;
 import com.catalina.Lifecycle;
 import com.catalina.LifecycleException;
 import com.catalina.LifecycleListener;
+import com.catalina.LifecycleSupport;
 import com.catalina.Logger;
 import com.catalina.Realm;
 import com.util.HexUtils;
-import com.util.LifecycleSupport;
 import com.util.StringManager;
 import com.util.MD5Encoder;
 
@@ -439,10 +439,12 @@ public abstract class RealmBase
         boolean result = gp.hasRole(role);
         if (debug >= 2) {
             String name = principal.getName();
+            /*
             if (result)
                 log(sm.getString("realmBase.hasRoleSuccess", name, role));
             else
                 log(sm.getString("realmBase.hasRoleFailure", name, role));
+        	*/
         }
         return (result);
 
