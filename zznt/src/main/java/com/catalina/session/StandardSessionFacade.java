@@ -1,7 +1,7 @@
 /*
- * $Header: /home/cvs/jakarta-tomcat-4.0/catalina/src/share/org/apache/catalina/Context.java,v 1.21 2002/05/12 01:22:18 glenn Exp $
- * $Revision: 1.21 $
- * $Date: 2002/05/12 01:22:18 $
+ * $Header: /home/cvs/jakarta-tomcat-4.0/catalina/src/share/org/apache/catalina/session/StandardSessionFacade.java,v 1.1 2001/05/14 04:07:55 remm Exp $
+ * $Revision: 1.1 $
+ * $Date: 2001/05/14 04:07:55 $
  *
  * ====================================================================
  *
@@ -62,108 +62,143 @@
  */
 
 
-package com.catalina;
+package com.catalina.session;
 
+
+import java.util.Enumeration;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionContext;
 
-import com.catalina.loader.WebappLoader;
-import com.catalina.logger.FileLogger;
-import com.util.CharsetMapper;
 
 /**
- * A <b>Context</b> is a Container that represents a servlet context, and
- * therefore an individual web application, in the Catalina servlet engine.
- * It is therefore useful in almost every deployment of Catalina (even if a
- * Connector attached to a web server (such as Apache) uses the web server's
- * facilities to identify the appropriate Wrapper to handle this request.
- * It also provides a convenient mechanism to use Interceptors that see
- * every request processed by this particular web application.
- * <p>
- * The parent Container attached to a Context is generally a Host, but may
- * be some other implementation, or may be omitted if it is not necessary.
- * <p>
- * The child containers attached to a Context are generally implementations
- * of Wrapper (representing individual servlet definitions).
- * <p>
+ * Facade for the StandardSession object.
  *
- * @author Craig R. McClanahan
- * @version $Revision: 1.21 $ $Date: 2002/05/12 01:22:18 $
+ * @author Remy Maucherat
+ * @version $Revision: 1.1 $ $Date: 2001/05/14 04:07:55 $
  */
 
-public interface Context extends Container {
+public class StandardSessionFacade
+    implements HttpSession {
 
 
-    // ----------------------------------------------------- Manifest Constants
-
-
-    /**
-     * The LifecycleEvent type sent when a context is reloaded.
-     */
-    public static final String RELOAD_EVENT = "reload";
-
-
-    // ------------------------------------------------------------- Properties
+    // ----------------------------------------------------------- Constructors
 
 
     /**
-     * Return the set of initialized application listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
-     *
-     * @exception IllegalStateException if this method is called before
-     *  this application has started, or after it has been stopped
+     * Construct a new session facade.
      */
-    public Object[] getApplicationListeners();
+    public StandardSessionFacade(StandardSession session) {
+        super();
+        this.session = (HttpSession) session;
+    }
 
 
     /**
-     * Store the set of initialized application listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
-     *
-     * @param listeners The set of instantiated listener objects.
+     * Construct a new session facade.
      */
-    public void setApplicationListeners(Object listeners[]);
+    public StandardSessionFacade(HttpSession session) {
+        super();
+        this.session = session;
+    }
+
+
+    // ----------------------------------------------------- Instance Variables
 
 
     /**
-     * Return the application available flag for this Context.
+     * Wrapped session object.
      */
-    public boolean getAvailable();
+    private HttpSession session = null;
 
 
-    /**
-     * Set the application available flag for this Context.
-     *
-     * @param available The new application available flag
-     */
-    public void setAvailable(boolean available);
+    // ---------------------------------------------------- HttpSession Methods
 
 
-	public ServletContext getServletContext();
+    public long getCreationTime() {
+        return session.getCreationTime();
+    }
 
 
-	public Manager getManager();
+    public String getId() {
+        return session.getId();
+    }
 
 
-	public boolean getCookies();
+    public long getLastAccessedTime() {
+        return session.getLastAccessedTime();
+    }
 
 
-	public CharsetMapper getCharsetMapper();
-
-	
-	public String getPath();
-
-	
-	public void addServletMapping(String string, String string2);
+    public ServletContext getServletContext() {
+        // FIXME : Facade this object ?
+        return session.getServletContext();
+    }
 
 
-	public void reload();
+    public void setMaxInactiveInterval(int interval) {
+        session.setMaxInactiveInterval(interval);
+    }
 
 
-	public boolean getReloadable();
+    public int getMaxInactiveInterval() {
+        return session.getMaxInactiveInterval();
+    }
 
 
-	public int getSessionTimeout();
+    public HttpSessionContext getSessionContext() {
+        return session.getSessionContext();
+    }
+
+
+    public Object getAttribute(String name) {
+        return session.getAttribute(name);
+    }
+
+
+    public Object getValue(String name) {
+        return session.getAttribute(name);
+    }
+
+
+    public Enumeration getAttributeNames() {
+        return session.getAttributeNames();
+    }
+
+
+    public String[] getValueNames() {
+        return session.getValueNames();
+    }
+
+
+    public void setAttribute(String name, Object value) {
+        session.setAttribute(name, value);
+    }
+
+
+    public void putValue(String name, Object value) {
+        session.setAttribute(name, value);
+    }
+
+
+    public void removeAttribute(String name) {
+        session.removeAttribute(name);
+    }
+
+
+    public void removeValue(String name) {
+        session.removeAttribute(name);
+    }
+
+
+    public void invalidate() {
+        session.invalidate();
+    }
+
+
+    public boolean isNew() {
+        return session.isNew();
+    }
+
 
 }

@@ -1,7 +1,7 @@
 /*
- * $Header: /home/cvs/jakarta-tomcat-4.0/catalina/src/share/org/apache/catalina/Context.java,v 1.21 2002/05/12 01:22:18 glenn Exp $
- * $Revision: 1.21 $
- * $Date: 2002/05/12 01:22:18 $
+ * $Header: /home/cvs/jakarta-tomcat-4.0/catalina/src/share/org/apache/catalina/Engine.java,v 1.9 2002/09/09 23:39:03 amyroh Exp $
+ * $Revision: 1.9 $
+ * $Date: 2002/09/09 23:39:03 $
  *
  * ====================================================================
  *
@@ -64,106 +64,105 @@
 
 package com.catalina;
 
-import javax.servlet.ServletContext;
-
-import com.catalina.loader.WebappLoader;
-import com.catalina.logger.FileLogger;
-import com.util.CharsetMapper;
-
 /**
- * A <b>Context</b> is a Container that represents a servlet context, and
- * therefore an individual web application, in the Catalina servlet engine.
- * It is therefore useful in almost every deployment of Catalina (even if a
- * Connector attached to a web server (such as Apache) uses the web server's
- * facilities to identify the appropriate Wrapper to handle this request.
- * It also provides a convenient mechanism to use Interceptors that see
- * every request processed by this particular web application.
+ * An <b>Engine</b> is a Container that represents the entire Catalina servlet
+ * engine.  It is useful in the following types of scenarios:
+ * <ul>
+ * <li>You wish to use Interceptors that see every single request processed
+ *     by the entire engine.
+ * <li>You wish to run Catalina in with a standalone HTTP connector, but still
+ *     want support for multiple virtual hosts.
+ * </ul>
+ * In general, you would not use an Engine when deploying Catalina connected
+ * to a web server (such as Apache), because the Connector will have
+ * utilized the web server's facilities to determine which Context (or
+ * perhaps even which Wrapper) should be utilized to process this request.
  * <p>
- * The parent Container attached to a Context is generally a Host, but may
- * be some other implementation, or may be omitted if it is not necessary.
+ * The child containers attached to an Engine are generally implementations
+ * of Host (representing a virtual host) or Context (representing individual
+ * an individual servlet context), depending upon the Engine implementation.
  * <p>
- * The child containers attached to a Context are generally implementations
- * of Wrapper (representing individual servlet definitions).
- * <p>
+ * If used, an Engine is always the top level Container in a Catalina
+ * hierarchy. Therefore, the implementation's <code>setParent()</code> method
+ * should throw <code>IllegalArgumentException</code>.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 1.21 $ $Date: 2002/05/12 01:22:18 $
+ * @version $Revision: 1.9 $ $Date: 2002/09/09 23:39:03 $
  */
 
-public interface Context extends Container {
-
-
-    // ----------------------------------------------------- Manifest Constants
-
-
-    /**
-     * The LifecycleEvent type sent when a context is reloaded.
-     */
-    public static final String RELOAD_EVENT = "reload";
+public interface Engine extends Container {
 
 
     // ------------------------------------------------------------- Properties
 
 
     /**
-     * Return the set of initialized application listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
-     *
-     * @exception IllegalStateException if this method is called before
-     *  this application has started, or after it has been stopped
+     * Return the default hostname for this Engine.
      */
-    public Object[] getApplicationListeners();
+    public String getDefaultHost();
 
 
     /**
-     * Store the set of initialized application listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
+     * Set the default hostname for this Engine.
      *
-     * @param listeners The set of instantiated listener objects.
+     * @param defaultHost The new default host
      */
-    public void setApplicationListeners(Object listeners[]);
+    public void setDefaultHost(String defaultHost);
 
 
     /**
-     * Return the application available flag for this Context.
+     * Retrieve the JvmRouteId for this engine.
      */
-    public boolean getAvailable();
+    public String getJvmRoute();
 
 
     /**
-     * Set the application available flag for this Context.
+     * Set the JvmRouteId for this engine.
      *
-     * @param available The new application available flag
+     * @param jvmRouteId the (new) JVM Route ID. Each Engine within a cluster
+     *        must have a unique JVM Route ID.
      */
-    public void setAvailable(boolean available);
+    public void setJvmRoute(String jvmRouteId);
 
 
-	public ServletContext getServletContext();
+    /**
+     * Return the <code>Service</code> with which we are associated (if any).
+     */
+    public Service getService();
 
 
-	public Manager getManager();
+    /**
+     * Set the <code>Service</code> with which we are associated (if any).
+     *
+     * @param service The service that owns this Engine
+     */
+    public void setService(Service service);
 
 
-	public boolean getCookies();
+    /**
+     * Set the DefaultContext
+     * for new web applications.
+     *
+     * @param defaultContext The new DefaultContext
+     */
+    public void addDefaultContext(DefaultContext defaultContext);
 
 
-	public CharsetMapper getCharsetMapper();
-
-	
-	public String getPath();
-
-	
-	public void addServletMapping(String string, String string2);
+    /**
+     * Retrieve the DefaultContext for new web applications.
+     */
+    public DefaultContext getDefaultContext();
 
 
-	public void reload();
+    // --------------------------------------------------------- Public Methods
 
 
-	public boolean getReloadable();
+    /**
+     * Import the DefaultContext config into a web application context.
+     *
+     * @param context web application context to import default context
+     */
+    public void importDefaultContext(Context context);
 
-
-	public int getSessionTimeout();
 
 }

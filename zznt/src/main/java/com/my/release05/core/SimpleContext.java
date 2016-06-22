@@ -254,4 +254,10 @@ public class SimpleContext implements Context, Pipeline {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public int getSessionTimeout() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }
