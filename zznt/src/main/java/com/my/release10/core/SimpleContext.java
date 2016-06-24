@@ -1,4 +1,4 @@
-package com.my.release07.core;
+package com.my.release10.core;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -21,6 +21,7 @@ import com.catalina.Pipeline;
 import com.catalina.Request;
 import com.catalina.Response;
 import com.catalina.Valve;
+import com.my.release07.core.SimpleContextValve;
 import com.util.CharsetMapper;
 import com.util.ContextBase;
 

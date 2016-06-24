@@ -16,6 +16,7 @@ import com.catalina.Loader;
 import com.catalina.Logger;
 import com.catalina.Mapper;
 import com.catalina.Pipeline;
+import com.catalina.Realm;
 import com.catalina.Request;
 import com.catalina.Response;
 import com.catalina.Valve;
@@ -427,5 +428,17 @@ public class SimpleWrapper implements Wrapper, Pipeline, Lifecycle{
 	public DirContext getResources() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Realm getRealm() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setRealm(Realm realm) {
+		// TODO Auto-generated method stub
+		
 	}
 }

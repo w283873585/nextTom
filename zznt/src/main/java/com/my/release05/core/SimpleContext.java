@@ -18,8 +18,9 @@ import com.catalina.Request;
 import com.catalina.Response;
 import com.catalina.Valve;
 import com.util.CharsetMapper;
+import com.util.ContextBase;
 
-public class SimpleContext implements Context, Pipeline {
+public class SimpleContext extends ContextBase implements Context, Pipeline {
 	
 	public SimpleContext() {
 		pipeline.setBasic(new SimpleContextValve());

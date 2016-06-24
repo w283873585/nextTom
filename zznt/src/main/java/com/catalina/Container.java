@@ -241,24 +241,24 @@ public interface Container {
 //     * @param parent The new parent class loader
 //     */
     public void setParentClassLoader(ClassLoader parent);
-//
-//
-//    /**
-//     * Return the Realm with which this Container is associated.  If there is
-//     * no associated Realm, return the Realm associated with our parent
-//     * Container (if any); otherwise return <code>null</code>.
-//     */
-//    public Realm getRealm();
-//
-//
-//    /**
-//     * Set the Realm with which this Container is associated.
-//     *
-//     * @param realm The newly associated Realm
-//     */
-//    public void setRealm(Realm realm);
-//
-//
+
+
+    /**
+     * Return the Realm with which this Container is associated.  If there is
+     * no associated Realm, return the Realm associated with our parent
+     * Container (if any); otherwise return <code>null</code>.
+     */
+    public Realm getRealm();
+
+
+    /**
+     * Set the Realm with which this Container is associated.
+     *
+     * @param realm The newly associated Realm
+     */
+    public void setRealm(Realm realm);
+
+
 //    /**
 //     * Return the Resources with which this Container is associated.  If there
 //     * is no associated Resources object, return the Resources associated with

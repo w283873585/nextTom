@@ -66,8 +66,8 @@ package com.catalina;
 
 import javax.servlet.ServletContext;
 
-import com.catalina.loader.WebappLoader;
-import com.catalina.logger.FileLogger;
+import com.catalina.deploy.LoginConfig;
+import com.catalina.deploy.SecurityConstraint;
 import com.util.CharsetMapper;
 
 /**
@@ -166,4 +166,15 @@ public interface Context extends Container {
 
 	public int getSessionTimeout();
 
+
+	public LoginConfig getLoginConfig();
+	
+	
+	public SecurityConstraint[] findConstraints();
+
+
+	public void setConfigured(boolean b);
+
+
+	public void setLoginConfig(LoginConfig loginConfig);
 }
