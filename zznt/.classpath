@@ -33,5 +33,9 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="src/main/resources/commons-digester.jar"/>
+	<classpathentry kind="lib" path="C:/Users/xnxs/Desktop/HowTomcatWorks/lib/commons-digester.jar"/>
+	<classpathentry kind="lib" path="C:/Users/xnxs/Desktop/HowTomcatWorks/lib/commons-collections.jar"/>
+	<classpathentry kind="lib" path="C:/Users/xnxs/Desktop/HowTomcatWorks/lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="C:/Users/xnxs/Desktop/HowTomcatWorks/lib/commons-beanutils.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -177,4 +177,13 @@ public interface Context extends Container {
 
 
 	public void setLoginConfig(LoginConfig loginConfig);
+
+
+	public void setPath(String string);
+
+
+	public void setDocBase(String string);
+
+
+	public void addConstraint(SecurityConstraint constraint);
 }

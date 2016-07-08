@@ -46,7 +46,6 @@ public class SimpleContext extends ContextBase implements Context, Pipeline, Lif
 	
 	@Override
 	public String getInfo() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -309,32 +308,6 @@ public class SimpleContext extends ContextBase implements Context, Pipeline, Lif
 	}
 
 	@Override
-	public Valve getBasic() {
-		return pipeline.getBasic();
-	}
-
-	@Override
-	public void setBasic(Valve valve) {
-		pipeline.setBasic(valve);
-	}
-
-	@Override
-	public void addValve(Valve valve) {
-		pipeline.addValve(valve);
-		
-	}
-
-	@Override
-	public Valve[] getValves() {
-		return pipeline.getValves();
-	}
-
-	@Override
-	public void removeValve(Valve valve) {
-		pipeline.removeValve(valve);
-	}
-
-	@Override
 	public Logger getLogger() {
 		return logger;
 	}
@@ -373,7 +346,36 @@ public class SimpleContext extends ContextBase implements Context, Pipeline, Lif
 		return 0;
 	}
 	
+	
+	// --------------------------------------- pipeline methods
+	
 	public Pipeline getPipeline() {
 		return this.pipeline;
+	}
+	
+	@Override
+	public Valve getBasic() {
+		return pipeline.getBasic();
+	}
+
+	@Override
+	public void setBasic(Valve valve) {
+		pipeline.setBasic(valve);
+	}
+
+	@Override
+	public void addValve(Valve valve) {
+		pipeline.addValve(valve);
+		
+	}
+
+	@Override
+	public Valve[] getValves() {
+		return pipeline.getValves();
+	}
+
+	@Override
+	public void removeValve(Valve valve) {
+		pipeline.removeValve(valve);
 	}
 }

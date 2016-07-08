@@ -5,12 +5,14 @@ import com.catalina.deploy.LoginConfig;
 import com.catalina.deploy.SecurityConstraint;
 
 public abstract class ContextBase {
+	private Realm realm = null;
+	
 	public LoginConfig getLoginConfig() {
 		return null;
 	}
 	
 	public Realm getRealm() {
-		return null;
+		return realm;
 	}
 
 
@@ -20,7 +22,7 @@ public abstract class ContextBase {
      * @param realm The newly associated Realm
      */
     public void setRealm(Realm realm) {
-    	
+    	this.realm = realm;
     }
     
     public SecurityConstraint[] findConstraints() {
@@ -31,4 +33,10 @@ public abstract class ContextBase {
 
 
 	public void setLoginConfig(LoginConfig loginConfig){}
+	
+	public void setPath(String path) {}
+
+	public void setDocBase(String doc) {}
+	
+	public void addConstraint(SecurityConstraint constraint) {}
 }
